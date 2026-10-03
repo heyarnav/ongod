@@ -27,6 +27,13 @@ type Order = {
   paymentStatus: string;
   status: string;
   razorpayPaymentId: string;
+  /** Gateway order id we issued. Empty while the gateway is dormant. */
+  razorpayOrderId: string;
+  /** Money arrived after the hold closed — settle it by hand. */
+  refundRequired: boolean;
+  /** Server-side deadline for the stock hold, if one is live. */
+  reservationExpiresAt: string;
+  paidAt: string;
   trackingNumber: string;
   trackingUrl: string;
   createdAt: string;
@@ -102,6 +109,16 @@ export function OrderRow({ order, first }: { order: Order; first: boolean }) {
                 <p className="mt-2 leading-relaxed text-faint">{order.address}</p>
               </div>
 
+              {order.refundRequired && (
+                <div className="mt-4 border border-crimson/70 bg-crimson/10 px-3 py-2">
+                  <Chip tone="warn">REFUND REQUIRED</Chip>
+                  <p className="mt-2 font-mono text-[10px] leading-relaxed text-crimson">
+                    Payment arrived after the reservation expired. Refund it in the Razorpay
+                    dashboard — the payment id is below.
+                  </p>
+                </div>
+              )}
+
               <p className="mt-5 font-mono text-[9px] tracking-[0.3em] text-faint">MANIFEST</p>
               <ul className="mt-2 space-y-1.5">
                 {order.items.map((it) => (
@@ -141,9 +158,7 @@ export function OrderRow({ order, first }: { order: Order; first: boolean }) {
                 </span>
               </div>
 
-              <p className="mt-5 font-mono text-[9px] tracking-[0.3em] text-faint">
-                ORDER STATUS
-              </p>
+              <p className="mt-5 font-mono text-[9px] tracking-[0.3em] text-faint">ORDER STATUS</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {ORDER_STATUSES.map((s) => (
                   <button
@@ -160,6 +175,58 @@ export function OrderRow({ order, first }: { order: Order; first: boolean }) {
                   </button>
                 ))}
               </div>
+
+              {/* The gateway identifiers and the reservation deadline: what an
+                  operator needs when reconciling against the Razorpay dashboard
+                  and when stock returns to sale. */}
+              {(order.razorpayOrderId || order.paidAt) && (
+                <>
+                  <p className="mt-5 font-mono text-[9px] tracking-[0.3em] text-faint">
+                    GATEWAY
+                  </p>
+                  <dl className="mt-2 space-y-1 font-mono text-[10px] text-faint">
+                    {order.razorpayOrderId && (
+                      <div className="flex gap-2">
+                        <dt className="shrink-0 text-faint/60">ORDER</dt>
+                        <dd className="truncate">{order.razorpayOrderId}</dd>
+                      </div>
+                    )}
+                    {order.paidAt && (
+                      <div className="flex gap-2">
+                        <dt className="shrink-0 text-faint/60">PAID</dt>
+                        <dd>
+                          {new Date(order.paidAt).toLocaleString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                </>
+              )}
+
+              {order.reservationExpiresAt && (
+                <>
+                  <p className="mt-5 font-mono text-[9px] tracking-[0.3em] text-faint">
+                    STOCK HELD UNTIL
+                  </p>
+                  <p className="mt-2 font-mono text-[10px] text-faint">
+                    {new Date(order.reservationExpiresAt).toLocaleString("en-IN", {
+                      day: "2-digit",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                    <span className="ml-2 text-faint/60">
+                      · returns to sale if unpaid
+                    </span>
+                  </p>
+                </>
+              )}
 
               <p className="mt-5 font-mono text-[9px] tracking-[0.3em] text-faint">TRACKING</p>
               <div className="mt-2 grid grid-cols-2 gap-2">
@@ -186,7 +253,7 @@ export function OrderRow({ order, first }: { order: Order; first: boolean }) {
 
               <p className="mt-5 font-mono text-[9px] leading-relaxed text-faint/60">
                 {order.status === "PENDING" &&
-                  "Awaiting payment activation. The object is reserved at checkout."}
+                  "Awaiting payment. The piece is held until the reservation expires or the money lands."}
                 {order.status === "PAID" && "Payment confirmed. Ready for production."}
                 {order.status === "IN_PRODUCTION" && "Being produced as part of the edition."}
                 {order.status === "QUALITY_CHECK" && "Under inspection before packaging."}

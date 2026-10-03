@@ -9,7 +9,8 @@ export default async function AdminOrdersPage() {
     .from("orders")
     .select(
       `id, order_number, shipping_name, email, shipping_phone, status, payment_status,
-       subtotal, shipping_amount, total, currency, gateway_payment_id,
+       subtotal, shipping_amount, total, currency, gateway_payment_id, gateway_order_id,
+       refund_required, paid_at, reservation_expires_at,
        shipping_address_line_1, shipping_address_line_2, shipping_city,
        shipping_state, shipping_postal_code, tracking_number, tracking_url,
        placed_at, created_at,
@@ -58,6 +59,10 @@ export default async function AdminOrdersPage() {
                 paymentStatus: String(o.payment_status ?? "PENDING"),
                 status: String(o.status ?? "PENDING"),
                 razorpayPaymentId: String(o.gateway_payment_id ?? ""),
+                razorpayOrderId: String(o.gateway_order_id ?? ""),
+                refundRequired: o.refund_required === true,
+                reservationExpiresAt: String(o.reservation_expires_at ?? ""),
+                paidAt: String(o.paid_at ?? ""),
                 trackingNumber: String(o.tracking_number ?? ""),
                 trackingUrl: String(o.tracking_url ?? ""),
                 createdAt: new Date(String(o.placed_at ?? o.created_at)).toISOString(),

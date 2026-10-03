@@ -64,6 +64,10 @@ stays `PENDING`.
 | `npm run admin:grant you@yourdomain.com` | writes the operator's `admin_users` grant; refuses to add a second one unless `--force` |
 | `npm run admin:password you@yourdomain.com` | sets the operator's Auth password at a hidden prompt and verifies it with a real sign-in — no recovery email, no `.env` |
 | `npm run media:import` | uploads `public/images` + `public/models` into the `ongod-media` bucket |
+| `npm run email:preview` | renders the six auth email templates to `supabase/email-templates/preview.html`, placeholders unsubstituted |
+| `npm run orders:expire` | returns stock held by orders whose 30-minute payment window closed |
+| `npm run test:payments` | reservation lifecycle against the live database (reserve, capture, expire, late payment, RLS guard) |
+| `node scripts/test-checkout-flow.mjs` | authenticated checkout + webhook signature contract against the running server |
 | `node scripts/verify-schema.mjs` | read-only: asserts the live database matches what the app expects |
 | `node scripts/e2e.mjs` | end-to-end tests against the running app and live database |
 
@@ -168,12 +172,27 @@ Control Room access is two things stacked:
 Signing in on its own buys nothing. A customer who signs in normally is
 authenticated and still refused by `requireAdmin()`.
 
+Signing in is passwordless, exactly like the customer register: `/admin/login`
+sends a one-time code. What it may **not** do is send one to anyone — `POST
+/api/admin/login-code` looks up the grant first and mails a code only when
+`admin_users` already holds that address. So the login screen cannot create
+accounts, cannot spend the email quota on strangers, and cannot be used to
+discover which addresses are operators: the gate, the response and the response
+time are identical either way, and the actual send is deferred until after the
+response has gone. A verified code still proves nothing on its own — the grant
+is re-checked after verification, and `requireAdmin()` still refuses a session
+without one.
+
 ```bash
 # 1. In the dashboard: Authentication -> Users -> "Add user"
 # 2. Then, in this repo:
 npm run admin:password you@yourdomain.com   # sets the password, no email involved
 npm run admin:grant    you@yourdomain.com   # writes the grant
 ```
+
+The operator's password is never used by the form and does not need to be known
+to anyone. It stays in Supabase Auth as an escape hatch: if mail is down, you can
+still `signInWithPassword` against the auth API directly.
 
 `admin:password` exists because **Supabase's built-in email provider allows 2
 emails per hour, project-wide** (dashboard: Authentication → Rate Limits). That
@@ -234,8 +253,10 @@ separates the cases in the copy the shopper sees.
    reputation.
 4. Dashboard → **Authentication → URL Configuration**: allow the redirect URL
    that receives the code. The login page sends `emailRedirectTo` as
-   `${origin}/account`, so allow `http://localhost:3000/account` now and your
-   real domain when it exists.
+   `${origin}/auth/callback?next=%2Faccount`, so allow
+   `http://localhost:3000/auth/callback` now and `https://<your-domain>/auth/callback`
+   when it exists. Every emailed link lands on that route and nowhere else — it
+   is the only writer of the session cookie.
 5. Turn on **CAPTCHA** in the same Authentication settings. Bots signing up with
    other people's addresses is the standard way an email budget disappears, and
    Supabase's built-in hCaptcha/Turnstile stops it for free.
@@ -271,6 +292,29 @@ Two settings are still worth acting on now that mail flows: the email rate limit
 becomes editable only once custom SMTP is on (it defaults to 30/hour), and the
 redirect allowlist still carries localhost rather than the real domain.
 
+### Templates
+
+Auth mail is the first thing a shopper ever sees from this label, so it is
+written in the site's own ink rather than Supabase's default grey:
+[supabase/email-templates/](supabase/email-templates/) holds a body for all six
+of Auth's templates, with the exact subject line for each. Subjects are short
+and wordless — `Your on god. code`, `Reset your password` — and no body carries
+the tagline, because brand copy in auth mail reads as marketing to every filter.
+
+```bash
+npm run email:preview       # render all six to supabase/email-templates/preview.html
+```
+
+The preview substitutes nothing: `{{ .Token }}` shows as `{{ .Token }}`, so what
+is approved on screen is the body Supabase parses. Bodies cannot be set through
+an API — pasting them into **Authentication → Templates** is a dashboard job,
+and the per-template field list is in
+[that folder's README](supabase/email-templates/README.md).
+
+While there, confirm **Email OTP length is still `6`**. At `0` Supabase sends a
+link instead of digits and the login page, which accepts only six digits, will
+never accept what arrives.
+
 ---
 
 ## Control Room
@@ -287,6 +331,84 @@ question an operator opens the Control Room with is one question, not two.
 
 ## Payments
 
-Dormant by design. `src/lib/razorpay/` is a seam with no credentials behind
-it. Orders are created with `payment_status = 'PENDING'` and stay that way
-until a provider is configured and a real payment is captured.
+Built, and dormant for want of credentials rather than want of code. With
+`RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` unset the order still exists, the
+piece is still held, and `payment_status` stays `PENDING` while `/checkout`
+says so in as many words. See Checkout, Reservations and Razorpay below.
+### Checkout
+
+Buying no longer requires an account first. The old flow filled a form, threw
+it away, redirected to `/account/login`, waited for an email, took a code and
+asked for the address a second time.
+
+```
+/checkout -> form -> 6-digit code (inline) -> order -> Razorpay -> confirmation
+```
+
+The form never unmounts. The OTP panel renders beside the fields, so name,
+phone, address, sizes and quantities survive it. A refresh restores them from
+`sessionStorage` (address and preferences only — never a token, never card
+data). Identity is still Supabase Auth and only Supabase Auth; what changed is
+*when* proof is demanded and *where* it is typed.
+
+`getCustomer()` materialises the profile row on first authenticated read, which
+now happens after the OTP. **No order and no inventory movement happens before
+the address is proven.**
+
+OTP requests go through `POST /api/checkout/otp`, which is public and
+throttled: three per address per ten minutes, twenty per IP per hour, on a
+server-side ledger (`checkout_otp_requests`, emails stored hashed). It always
+answers `200 {ok:true}` with an identical body and defers the send with
+`after()`, so neither the response nor its timing can be used to learn whether
+an address is a customer — the same reasoning as
+`/api/admin/login-code`.
+
+### Reservations
+
+An order holds its stock for 30 minutes. The deadline is a column
+(`orders.reservation_expires_at`), never a browser timer.
+
+| | |
+|---|---|
+| order placed | `PENDING`, stock decremented, deadline stamped |
+| payment captured | `PAID`, deadline cleared |
+| window closes | `CANCELLED`, stock returned |
+| payment arrives after expiry | `PAID` **and** `refund_required` — surfaced in the Control Room |
+
+A failed payment attempt does **not** release stock; the customer may retry
+inside the window. Only expiry returns it.
+
+`expire_reservations()` runs at the top of `place_order()`, from
+`npm run orders:expire`, and from `GET /api/cron/expire` (bearer `CRON_SECRET`)
+if Vercel Cron is wired to it. It and `mark_order_paid()` take the same row
+lock, so a capture landing on the 30-minute boundary cannot restore stock the
+payment then sells.
+
+### Razorpay
+
+Inactive until `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` are set, and then only
+up to KYC: **onboarding needs a registered business with a matching PAN and a
+business bank account.** Until then `/checkout` creates the order, holds the
+piece and says payment is not active yet.
+
+1. Order first, gateway order second. A Razorpay outage leaves a real order
+   holding real stock; `POST /api/checkout/gateway` retries the gateway leg
+   without creating a second order or decrementing twice.
+2. **The webhook is the authority.** `POST /api/webhooks/razorpay` verifies an
+   HMAC-SHA256 over the **raw body** with `RAZORPAY_WEBHOOK_SECRET`, then acts.
+   A customer who closes the browser after paying is still marked `PAID`.
+3. `/api/checkout/verify` is a fast path for the confirmation screen and shares
+   the same idempotent `mark_order_paid()`, so whichever arrives first wins.
+4. A browser success callback is never treated as proof.
+
+Dashboard → Settings → Webhooks → `https://<your-domain>/api/webhooks/razorpay`,
+subscribed to `payment.captured`, `payment.failed`, `refund.processed`. The
+webhook secret is generated on the webhook and is **not** the API key secret.
+
+### Payment state is not writable by the browser
+
+`0003_rls.sql` granted customers `UPDATE` on their own orders with no column
+restriction, which included `payment_status`. It was unused, but the anon-keyed
+browser client could reach it and mark themselves paid. That policy is dropped;
+a `BEFORE UPDATE` trigger now refuses any write that is not `service_role` or
+the function owner. `orders` are written by the database or by nothing.

@@ -2,17 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin, requireCustomer } from "@/lib/supabase/session";
-import { verifyRazorpaySignature } from "@/lib/razorpay";
+import { verifyCheckoutSignature } from "@/lib/razorpay";
 
 /**
- * Payment verification — server-side only, and DORMANT.
+ * Payment verification — the fast path after Razorpay Checkout returns.
  *
- * This route exists so the schema and the seam stay ready, not because
- * Razorpay is switched on. With no credentials configured the signature check
- * can never succeed, so no order is ever marked PAID through this path.
+ * The WEBHOOK remains authoritative; this exists so the confirmation screen can
+ * resolve in a second instead of waiting for Razorpay to call us back. Both
+ * routes funnel into the same idempotent `mark_order_paid()`, so whichever
+ * arrives first wins and the second is a no-op that reports the truth.
  *
- * When it is eventually activated: the HMAC is verified before anything is
- * written, and the order must already carry the gateway order id we issued.
+ * What is checked before anything is written:
+ *
+ *   - the order exists and carries the gateway order id WE issued, so a
+ *     browser cannot point an unrelated order id at a real payment;
+ *   - the caller is the customer who owns it, or Control Room staff;
+ *   - the HMAC over `razorpay_order_id|razorpay_payment_id` matches.
+ *
+ * A failed verification does NOT mark the order FAILED. A failed *signature* is
+ * evidence of tampering, not evidence that the customer's card was declined, and
+ * conflating the two would cancel an order whose money may well have arrived.
  */
 const VerifySchema = z.object({
   orderNumber: z.string().min(3),
@@ -28,8 +37,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "INVALID_REQUEST" }, { status: 400 });
   }
 
-  const { orderNumber, razorpayOrderId, razorpayPaymentId, razorpaySignature } =
-    parsed.data;
+  const { orderNumber, razorpayOrderId, razorpayPaymentId, razorpaySignature } = parsed.data;
 
   // The caller must be the customer who owns the order, or Control Room staff.
   const auth = await requireCustomer();
@@ -54,29 +62,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
   }
 
-  const valid = await verifyRazorpaySignature(
-    razorpayOrderId,
-    razorpayPaymentId,
-    razorpaySignature,
-  );
-
-  if (!valid) {
-    await supabase
-      .from("orders")
-      .update({ payment_status: "FAILED" })
-      .eq("id", order.id);
+  if (!verifyCheckoutSignature(razorpayOrderId, razorpayPaymentId, razorpaySignature)) {
+    console.warn(
+      `[checkout-verify] signature mismatch for order ${orderNumber} (payment ${razorpayPaymentId})`,
+    );
     return NextResponse.json({ error: "SIGNATURE_INVALID" }, { status: 400 });
   }
 
-  await supabase
-    .from("orders")
-    .update({
-      payment_status: "PAID",
-      status: "PAID",
-      gateway_payment_id: razorpayPaymentId,
-      gateway_signature: razorpaySignature,
-    })
-    .eq("id", order.id);
+  // The single writer of payment state.
+  const { data, error } = await supabase.rpc("mark_order_paid", {
+    p_razorpay_payment_id: razorpayPaymentId,
+    p_razorpay_signature: razorpaySignature,
+    p_razorpay_order_id: razorpayOrderId,
+  });
 
-  return NextResponse.json({ ok: true });
+  if (error) {
+    console.error("mark_order_paid failed:", error.message);
+    return NextResponse.json({ error: "VERIFY_FAILED" }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true, order: data });
 }

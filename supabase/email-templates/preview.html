@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>on god. — auth email templates</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; padding:0; background:#0D0C0A; color:#D8D1C5; -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:700px; margin:0 auto; padding:56px 20px 80px; }
+  a { color:#D8D1C5; }
+  code { font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; color:#98938A; }
+  /* Mail width is 600px plus the 16px gutters the templates set, so the frame
+     is laid out at a true 632px and only ever scaled *down* — never up, which
+     would lie about how large the type looks in an inbox. */
+  .frame { padding:0 0 28px; }
+  /* The scaled frame is still 632px of layout width, so the slot clips it —
+     otherwise the whole page grows a horizontal scrollbar on a narrow panel. */
+  .frame-slot { width:100%; overflow:hidden; }
+  .frame-box { width:632px; height:1180px; transform-origin:top left; overflow:hidden; }
+  .frame-box iframe { display:block; width:632px; height:100%; border:1px solid #272522; border-radius:2px; background:#0D0C0A; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div style="font:12px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.32em;text-transform:uppercase;color:#D8D1C5;">ON GOD.</div>
+  <table style="margin-top:22px;border-collapse:collapse;"><tr><td height="2" bgcolor="#7F1518" style="height:2px;line-height:2px;font-size:0;width:54px;">&nbsp;</td></tr></table>
+  <h1 style="margin:28px 0 0;font:400 34px/1.2 Georgia,'Times New Roman',serif;color:#D8D1C5;">Auth email templates.</h1>
+  <p style="margin:16px 0 0;max-width:620px;font:15px/1.8 Georgia,'Times New Roman',serif;color:#98938A;">Every body Supabase sends for this project, in the archive's own ink. Each frame below is the real template rendered by a browser at mail width — placeholders are shown as written (<code>{{ .Token }}</code>, <code>{{ .ConfirmationURL }}</code>) rather than filled in, so what you approve here is what Supabase will substitute into.</p>
+  <p style="margin:20px 0 0;max-width:620px;font:11px/2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.1em;color:#6E6A5F;">PASTE EACH BODY INTO AUTHENTICATION → TEMPLATES. SUBJECT LINES ARE LISTED WITH EACH TEMPLATE ABOVE.</p>
+
+<section style="padding:40px 0 48px;border-top:1px solid rgba(216,209,197,0.12);">
+  <div style="font:10px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.32em;text-transform:uppercase;color:#6E6A5F;">Authentication → Templates → Magic link or OTP</div>
+  <h2 style="margin:12px 0 0;font:400 30px/1.2 Georgia,'Times New Roman',serif;color:#D8D1C5;">Magic link or OTP</h2>
+  <div style="margin-top:14px;display:inline-block;padding:8px 14px;background:#131210;border:1px solid #2F2D29;border-radius:2px;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.1em;color:#D8D1C5;">Subject: Your on god. code</div>
+  <p style="margin:16px 0 0;max-width:620px;font:14px/1.75 Georgia,'Times New Roman',serif;color:#98938A;">The only template this application actually sends. Customers at /account/login and operators at /admin/login both request a six-digit code.</p>
+  <div style="margin-top:8px;font:10px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#44423D;">File: supabase/email-templates/magic-link-otp.html</div>
+  <div style="margin-top:28px;">
+<div class="frame">
+<div style="font:10px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.32em;text-transform:uppercase;color:#7F1518;padding:0 0 10px;">if .Token — Email OTP length = 6 (what you get today)</div>
+<div class="frame-slot"><div class="frame-box"><iframe title="Magic link or OTP" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; /&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot; /&gt;
+    &lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot; /&gt;
+    &lt;meta name=&quot;supported-color-schemes&quot; content=&quot;dark&quot; /&gt;
+    &lt;title&gt;Your on god. code&lt;/title&gt;
+    &lt;!--[if mso]&gt;
+    &lt;xml&gt;
+      &lt;o:OfficeDocumentSettings&gt;
+        &lt;o:AllowPNG /&gt;
+        &lt;o:PixelsPerInch&gt;96&lt;/o:PixelsPerInch&gt;
+      &lt;/o:OfficeDocumentSettings&gt;
+    &lt;/xml&gt;
+    &lt;![endif]--&gt;
+  &lt;/head&gt;
+  &lt;body style=&quot;margin:0; padding:0; width:100%; background-color:#0D0C0A; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;&quot;&gt;
+    &lt;!-- PREHEADER: read by the inbox list, never rendered --&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;A one-time code for the archive. It expires shortly.&lt;/div&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&lt;/div&gt;
+
+    &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#0D0C0A&quot; style=&quot;width:100%; background-color:#0D0C0A;&quot;&gt;
+      &lt;tr&gt;
+        &lt;td align=&quot;center&quot; style=&quot;padding:48px 16px;&quot;&gt;
+          &lt;!--[if mso]&gt;&lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;![endif]--&gt;
+          &lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot; bgcolor=&quot;#131210&quot; style=&quot;width:600px; max-width:600px; background-color:#131210; border:1px solid #2F2D29; border-color:rgba(216,209,197,0.14);&quot;&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:44px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:12px; line-height:1; letter-spacing:0.32em; text-transform:uppercase; color:#D8D1C5;&quot;&gt;ON GOD.&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:22px 0 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; width=&quot;54&quot; style=&quot;width:54px;&quot;&gt;&lt;tr&gt;&lt;td height=&quot;2&quot; bgcolor=&quot;#7F1518&quot; style=&quot;height:2px; line-height:2px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:28px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:1.4; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;One&amp;#8209;time code&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:16px 40px 0;&quot;&gt;
+                &lt;h1 style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:28px; line-height:1.2; font-weight:normal; letter-spacing:0.01em; color:#D8D1C5;&quot;&gt;This is your code.&lt;/h1&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:15px; line-height:1.7; font-style:italic; color:#98938A;&quot;&gt;Enter it at the archive to continue as {{ .Email }}.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+
+            &lt;!-- CODE PANEL — the path this project actually uses (Email OTP length = 6) --&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:30px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#0D0C0A&quot; style=&quot;width:100%; background-color:#0D0C0A; border:1px solid #4C1112;&quot;&gt;
+                  &lt;tr&gt;
+                    &lt;td align=&quot;center&quot; style=&quot;padding:26px 20px 28px;&quot;&gt;
+                      &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:1.4; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;Code&lt;/div&gt;
+                      &lt;div style=&quot;padding-top:16px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:34px; line-height:1.2; letter-spacing:0.34em; padding-left:0.34em; color:#D8D1C5;&quot;&gt;{{ .Token }}&lt;/div&gt;
+                    &lt;/td&gt;
+                  &lt;/tr&gt;
+                &lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:30px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot;&gt;
+                  &lt;tr&gt;
+                    &lt;td align=&quot;center&quot; bgcolor=&quot;#7F1518&quot; style=&quot;background-color:#7F1518;&quot;&gt;
+                      &lt;a href=&quot;{{ .SiteURL }}&quot; style=&quot;display:inline-block; padding:16px 36px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:10px; line-height:1.2; letter-spacing:0.32em; text-transform:uppercase; text-decoration:none; color:#D8D1C5; border:1px solid #9c2024;&quot;&gt;Enter the code&amp;nbsp;&amp;rarr;&lt;/a&gt;
+                    &lt;/td&gt;
+                  &lt;/tr&gt;
+                &lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:32px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #2F2D29; border-top-color:rgba(216,209,197,0.14);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:22px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;If you did not ask for this, ignore it. Nothing has changed.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:34px 40px 40px;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #272522; border-top-color:rgba(216,209,197,0.10);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+                &lt;div style=&quot;padding-top:24px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#64605A;&quot;&gt;Est. 2026 &amp;mdash; Human / Celestial / Divine&lt;/div&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;19.0760&amp;deg; N &amp;mdash; 72.8777&amp;deg; E&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;/table&gt;
+          &lt;!--[if mso]&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;![endif]--&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/body&gt;
+&lt;/html&gt;" sandbox="allow-same-origin" scrolling="no"></iframe></div></div>
+</div>
+<div class="frame">
+<div style="font:10px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.32em;text-transform:uppercase;color:#7F1518;padding:0 0 10px;">else — magic link (if the OTP length is ever cleared)</div>
+<div class="frame-slot"><div class="frame-box"><iframe title="Magic link or OTP" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; /&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot; /&gt;
+    &lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot; /&gt;
+    &lt;meta name=&quot;supported-color-schemes&quot; content=&quot;dark&quot; /&gt;
+    &lt;title&gt;Your on god. code&lt;/title&gt;
+    &lt;!--[if mso]&gt;
+    &lt;xml&gt;
+      &lt;o:OfficeDocumentSettings&gt;
+        &lt;o:AllowPNG /&gt;
+        &lt;o:PixelsPerInch&gt;96&lt;/o:PixelsPerInch&gt;
+      &lt;/o:OfficeDocumentSettings&gt;
+    &lt;/xml&gt;
+    &lt;![endif]--&gt;
+  &lt;/head&gt;
+  &lt;body style=&quot;margin:0; padding:0; width:100%; background-color:#0D0C0A; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;&quot;&gt;
+    &lt;!-- PREHEADER: read by the inbox list, never rendered --&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;A one-time code for the archive. It expires shortly.&lt;/div&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&lt;/div&gt;
+
+    &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#0D0C0A&quot; style=&quot;width:100%; background-color:#0D0C0A;&quot;&gt;
+      &lt;tr&gt;
+        &lt;td align=&quot;center&quot; style=&quot;padding:48px 16px;&quot;&gt;
+          &lt;!--[if mso]&gt;&lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;![endif]--&gt;
+          &lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot; bgcolor=&quot;#131210&quot; style=&quot;width:600px; max-width:600px; background-color:#131210; border:1px solid #2F2D29; border-color:rgba(216,209,197,0.14);&quot;&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:44px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:12px; line-height:1; letter-spacing:0.32em; text-transform:uppercase; color:#D8D1C5;&quot;&gt;ON GOD.&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:22px 0 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; width=&quot;54&quot; style=&quot;width:54px;&quot;&gt;&lt;tr&gt;&lt;td height=&quot;2&quot; bgcolor=&quot;#7F1518&quot; style=&quot;height:2px; line-height:2px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:28px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:1.4; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;One&amp;#8209;time code&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:16px 40px 0;&quot;&gt;
+                &lt;h1 style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:28px; line-height:1.2; font-weight:normal; letter-spacing:0.01em; color:#D8D1C5;&quot;&gt;This is your code.&lt;/h1&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:15px; line-height:1.7; font-style:italic; color:#98938A;&quot;&gt;Enter it at the archive to continue as {{ .Email }}.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+
+            &lt;!-- LINK PANEL — degrades here if the Email OTP length is ever cleared --&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:34px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:15px; line-height:1.7; color:#98938A;&quot;&gt;Or open the archive directly and we will do it for you.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:24px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot;&gt;
+                  &lt;tr&gt;
+                    &lt;td align=&quot;center&quot; bgcolor=&quot;#7F1518&quot; style=&quot;background-color:#7F1518;&quot;&gt;
+                      &lt;a href=&quot;{{ .ConfirmationURL }}&quot; style=&quot;display:inline-block; padding:16px 36px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:10px; line-height:1.2; letter-spacing:0.32em; text-transform:uppercase; text-decoration:none; color:#D8D1C5; border:1px solid #9c2024;&quot;&gt;Enter the archive&amp;nbsp;&amp;rarr;&lt;/a&gt;
+                    &lt;/td&gt;
+                  &lt;/tr&gt;
+                &lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:32px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #2F2D29; border-top-color:rgba(216,209,197,0.14);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:22px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;If you did not ask for this, ignore it. Nothing has changed.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:34px 40px 40px;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #272522; border-top-color:rgba(216,209,197,0.10);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+                &lt;div style=&quot;padding-top:24px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#64605A;&quot;&gt;Est. 2026 &amp;mdash; Human / Celestial / Divine&lt;/div&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;19.0760&amp;deg; N &amp;mdash; 72.8777&amp;deg; E&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;/table&gt;
+          &lt;!--[if mso]&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;![endif]--&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/body&gt;
+&lt;/html&gt;" sandbox="allow-same-origin" scrolling="no"></iframe></div></div>
+</div>
+  </div>
+</section>
+<section style="padding:40px 0 48px;border-top:1px solid rgba(216,209,197,0.12);">
+  <div style="font:10px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.32em;text-transform:uppercase;color:#6E6A5F;">Authentication → Templates → Confirm sign up</div>
+  <h2 style="margin:12px 0 0;font:400 30px/1.2 Georgia,'Times New Roman',serif;color:#D8D1C5;">Confirm sign up</h2>
+  <div style="margin-top:14px;display:inline-block;padding:8px 14px;background:#131210;border:1px solid #2F2D29;border-radius:2px;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.1em;color:#D8D1C5;">Subject: Confirm your address</div>
+  <p style="margin:16px 0 0;max-width:620px;font:14px/1.75 Georgia,'Times New Roman',serif;color:#98938A;">No sign-up form exists in this project — signInWithOtp mints customers on first use. Kept consistent for the unexposed path.</p>
+  <div style="margin-top:8px;font:10px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#44423D;">File: supabase/email-templates/confirm-signup.html</div>
+  <div style="margin-top:28px;">
+<div class="frame">
+
+<div class="frame-slot"><div class="frame-box"><iframe title="Confirm sign up" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; /&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot; /&gt;
+    &lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot; /&gt;
+    &lt;meta name=&quot;supported-color-schemes&quot; content=&quot;dark&quot; /&gt;
+    &lt;title&gt;Confirm your address&lt;/title&gt;
+    &lt;!--[if mso]&gt;
+    &lt;xml&gt;
+      &lt;o:OfficeDocumentSettings&gt;
+        &lt;o:AllowPNG /&gt;
+        &lt;o:PixelsPerInch&gt;96&lt;/o:PixelsPerInch&gt;
+      &lt;/o:OfficeDocumentSettings&gt;
+    &lt;/xml&gt;
+    &lt;![endif]--&gt;
+  &lt;/head&gt;
+  &lt;body style=&quot;margin:0; padding:0; width:100%; background-color:#0D0C0A; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;&quot;&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;Confirm the address you are registering with the archive.&lt;/div&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&lt;/div&gt;
+
+    &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#0D0C0A&quot; style=&quot;width:100%; background-color:#0D0C0A;&quot;&gt;
+      &lt;tr&gt;
+        &lt;td align=&quot;center&quot; style=&quot;padding:48px 16px;&quot;&gt;
+          &lt;!--[if mso]&gt;&lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;![endif]--&gt;
+          &lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot; bgcolor=&quot;#131210&quot; style=&quot;width:600px; max-width:600px; background-color:#131210; border:1px solid #2F2D29; border-color:rgba(216,209,197,0.14);&quot;&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:44px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:12px; line-height:1; letter-spacing:0.32em; text-transform:uppercase; color:#D8D1C5;&quot;&gt;ON GOD.&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:22px 0 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; width=&quot;54&quot; style=&quot;width:54px;&quot;&gt;&lt;tr&gt;&lt;td height=&quot;2&quot; bgcolor=&quot;#7F1518&quot; style=&quot;height:2px; line-height:2px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:28px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:1.4; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;Registration&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:16px 40px 0;&quot;&gt;
+                &lt;h1 style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:28px; line-height:1.2; font-weight:normal; letter-spacing:0.01em; color:#D8D1C5;&quot;&gt;Confirm this address.&lt;/h1&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:15px; line-height:1.7; font-style:italic; color:#98938A;&quot;&gt;You asked to enter the archive as {{ .Email }}. One step remains: prove the address is yours.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:34px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot;&gt;
+                  &lt;tr&gt;
+                    &lt;td align=&quot;center&quot; bgcolor=&quot;#7F1518&quot; style=&quot;background-color:#7F1518;&quot;&gt;
+                      &lt;a href=&quot;{{ .ConfirmationURL }}&quot; style=&quot;display:inline-block; padding:16px 36px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:10px; line-height:1.2; letter-spacing:0.32em; text-transform:uppercase; text-decoration:none; color:#D8D1C5; border:1px solid #9c2024;&quot;&gt;Confirm the address&amp;nbsp;&amp;rarr;&lt;/a&gt;
+                    &lt;/td&gt;
+                  &lt;/tr&gt;
+                &lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;The button does not work? Paste this into your browser:&lt;br /&gt;{{ .ConfirmationURL }}&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:32px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #2F2D29; border-top-color:rgba(216,209,197,0.14);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:22px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;If you did not ask for this, ignore it. Nothing has changed.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:34px 40px 40px;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #272522; border-top-color:rgba(216,209,197,0.10);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+                &lt;div style=&quot;padding-top:24px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#64605A;&quot;&gt;Est. 2026 &amp;mdash; Human / Celestial / Divine&lt;/div&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;19.0760&amp;deg; N &amp;mdash; 72.8777&amp;deg; E&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;/table&gt;
+          &lt;!--[if mso]&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;![endif]--&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/body&gt;
+&lt;/html&gt;" sandbox="allow-same-origin" scrolling="no"></iframe></div></div>
+</div>
+  </div>
+</section>
+<section style="padding:40px 0 48px;border-top:1px solid rgba(216,209,197,0.12);">
+  <div style="font:10px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.32em;text-transform:uppercase;color:#6E6A5F;">Authentication → Templates → Invite user</div>
+  <h2 style="margin:12px 0 0;font:400 30px/1.2 Georgia,'Times New Roman',serif;color:#D8D1C5;">Invite user</h2>
+  <div style="margin-top:14px;display:inline-block;padding:8px 14px;background:#131210;border:1px solid #2F2D29;border-radius:2px;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.1em;color:#D8D1C5;">Subject: Your invitation</div>
+  <p style="margin:16px 0 0;max-width:620px;font:14px/1.75 Georgia,'Times New Roman',serif;color:#98938A;">Operator onboarding. The grant itself is written by npm run admin:grant, never by this link.</p>
+  <div style="margin-top:8px;font:10px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#44423D;">File: supabase/email-templates/invite-user.html</div>
+  <div style="margin-top:28px;">
+<div class="frame">
+
+<div class="frame-slot"><div class="frame-box"><iframe title="Invite user" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; /&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot; /&gt;
+    &lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot; /&gt;
+    &lt;meta name=&quot;supported-color-schemes&quot; content=&quot;dark&quot; /&gt;
+    &lt;title&gt;Your invitation&lt;/title&gt;
+    &lt;!--[if mso]&gt;
+    &lt;xml&gt;
+      &lt;o:OfficeDocumentSettings&gt;
+        &lt;o:AllowPNG /&gt;
+        &lt;o:PixelsPerInch&gt;96&lt;/o:PixelsPerInch&gt;
+      &lt;/o:OfficeDocumentSettings&gt;
+    &lt;/xml&gt;
+    &lt;![endif]--&gt;
+  &lt;/head&gt;
+  &lt;body style=&quot;margin:0; padding:0; width:100%; background-color:#0D0C0A; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;&quot;&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;An invitation has been issued for {{ .Email }}.&lt;/div&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&lt;/div&gt;
+
+    &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#0D0C0A&quot; style=&quot;width:100%; background-color:#0D0C0A;&quot;&gt;
+      &lt;tr&gt;
+        &lt;td align=&quot;center&quot; style=&quot;padding:48px 16px;&quot;&gt;
+          &lt;!--[if mso]&gt;&lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;![endif]--&gt;
+          &lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot; bgcolor=&quot;#131210&quot; style=&quot;width:600px; max-width:600px; background-color:#131210; border:1px solid #2F2D29; border-color:rgba(216,209,197,0.14);&quot;&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:44px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:12px; line-height:1; letter-spacing:0.32em; text-transform:uppercase; color:#D8D1C5;&quot;&gt;ON GOD.&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:22px 0 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; width=&quot;54&quot; style=&quot;width:54px;&quot;&gt;&lt;tr&gt;&lt;td height=&quot;2&quot; bgcolor=&quot;#7F1518&quot; style=&quot;height:2px; line-height:2px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:28px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:1.4; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;Invitation&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:16px 40px 0;&quot;&gt;
+                &lt;h1 style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:28px; line-height:1.2; font-weight:normal; letter-spacing:0.01em; color:#D8D1C5;&quot;&gt;You have been invited.&lt;/h1&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:15px; line-height:1.7; font-style:italic; color:#98938A;&quot;&gt;An invitation has been issued for {{ .Email }}. Accepting it opens your record at the archive.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:34px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot;&gt;
+                  &lt;tr&gt;
+                    &lt;td align=&quot;center&quot; bgcolor=&quot;#7F1518&quot; style=&quot;background-color:#7F1518;&quot;&gt;
+                      &lt;a href=&quot;{{ .ConfirmationURL }}&quot; style=&quot;display:inline-block; padding:16px 36px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:10px; line-height:1.2; letter-spacing:0.32em; text-transform:uppercase; text-decoration:none; color:#D8D1C5; border:1px solid #9c2024;&quot;&gt;Accept the invitation&amp;nbsp;&amp;rarr;&lt;/a&gt;
+                    &lt;/td&gt;
+                  &lt;/tr&gt;
+                &lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;The button does not work? Paste this into your browser:&lt;br /&gt;{{ .ConfirmationURL }}&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:32px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #2F2D29; border-top-color:rgba(216,209,197,0.14);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:22px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;If this reached you by mistake, do not accept it.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:34px 40px 40px;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #272522; border-top-color:rgba(216,209,197,0.10);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+                &lt;div style=&quot;padding-top:24px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#64605A;&quot;&gt;Est. 2026 &amp;mdash; Human / Celestial / Divine&lt;/div&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;19.0760&amp;deg; N &amp;mdash; 72.8777&amp;deg; E&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;/table&gt;
+          &lt;!--[if mso]&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;![endif]--&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/body&gt;
+&lt;/html&gt;" sandbox="allow-same-origin" scrolling="no"></iframe></div></div>
+</div>
+  </div>
+</section>
+<section style="padding:40px 0 48px;border-top:1px solid rgba(216,209,197,0.12);">
+  <div style="font:10px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.32em;text-transform:uppercase;color:#6E6A5F;">Authentication → Templates → Change email address</div>
+  <h2 style="margin:12px 0 0;font:400 30px/1.2 Georgia,'Times New Roman',serif;color:#D8D1C5;">Change email address</h2>
+  <div style="margin-top:14px;display:inline-block;padding:8px 14px;background:#131210;border:1px solid #2F2D29;border-radius:2px;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.1em;color:#D8D1C5;">Subject: Confirm the change</div>
+  <p style="margin:16px 0 0;max-width:620px;font:14px/1.75 Georgia,'Times New Roman',serif;color:#98938A;">Shows both addresses: {{ .Email }} struck through above {{ .NewEmail }}.</p>
+  <div style="margin-top:8px;font:10px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#44423D;">File: supabase/email-templates/change-email.html</div>
+  <div style="margin-top:28px;">
+<div class="frame">
+
+<div class="frame-slot"><div class="frame-box"><iframe title="Change email address" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; /&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot; /&gt;
+    &lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot; /&gt;
+    &lt;meta name=&quot;supported-color-schemes&quot; content=&quot;dark&quot; /&gt;
+    &lt;title&gt;Confirm the change&lt;/title&gt;
+    &lt;!--[if mso]&gt;
+    &lt;xml&gt;
+      &lt;o:OfficeDocumentSettings&gt;
+        &lt;o:AllowPNG /&gt;
+        &lt;o:PixelsPerInch&gt;96&lt;/o:PixelsPerInch&gt;
+      &lt;/o:OfficeDocumentSettings&gt;
+    &lt;/xml&gt;
+    &lt;![endif]--&gt;
+  &lt;/head&gt;
+  &lt;body style=&quot;margin:0; padding:0; width:100%; background-color:#0D0C0A; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;&quot;&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;Confirm a change to the address on file.&lt;/div&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&lt;/div&gt;
+
+    &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#0D0C0A&quot; style=&quot;width:100%; background-color:#0D0C0A;&quot;&gt;
+      &lt;tr&gt;
+        &lt;td align=&quot;center&quot; style=&quot;padding:48px 16px;&quot;&gt;
+          &lt;!--[if mso]&gt;&lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;![endif]--&gt;
+          &lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot; bgcolor=&quot;#131210&quot; style=&quot;width:600px; max-width:600px; background-color:#131210; border:1px solid #2F2D29; border-color:rgba(216,209,197,0.14);&quot;&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:44px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:12px; line-height:1; letter-spacing:0.32em; text-transform:uppercase; color:#D8D1C5;&quot;&gt;ON GOD.&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:22px 0 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; width=&quot;54&quot; style=&quot;width:54px;&quot;&gt;&lt;tr&gt;&lt;td height=&quot;2&quot; bgcolor=&quot;#7F1518&quot; style=&quot;height:2px; line-height:2px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:28px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:1.4; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;Change of address&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:16px 40px 0;&quot;&gt;
+                &lt;h1 style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:28px; line-height:1.2; font-weight:normal; letter-spacing:0.01em; color:#D8D1C5;&quot;&gt;Confirm the change.&lt;/h1&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:15px; line-height:1.7; font-style:italic; color:#98938A;&quot;&gt;The address on file was asked to become:&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:26px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#0D0C0A&quot; style=&quot;width:100%; background-color:#0D0C0A; border:1px solid #2F2D29;&quot;&gt;
+                  &lt;tr&gt;
+                    &lt;td align=&quot;center&quot; style=&quot;padding:24px 20px 26px;&quot;&gt;
+                      &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:1.4; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;Current&lt;/div&gt;
+                      &lt;div style=&quot;padding-top:10px; font-family:Georgia,'Times New Roman',serif; font-size:15px; line-height:1.5; color:#98938A; text-decoration:line-through;&quot;&gt;{{ .Email }}&lt;/div&gt;
+                      &lt;div style=&quot;padding-top:22px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:1.4; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;Requested&lt;/div&gt;
+                      &lt;div style=&quot;padding-top:10px; font-family:Georgia,'Times New Roman',serif; font-size:17px; line-height:1.5; color:#D8D1C5;&quot;&gt;{{ .NewEmail }}&lt;/div&gt;
+                    &lt;/td&gt;
+                  &lt;/tr&gt;
+                &lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:30px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot;&gt;
+                  &lt;tr&gt;
+                    &lt;td align=&quot;center&quot; bgcolor=&quot;#7F1518&quot; style=&quot;background-color:#7F1518;&quot;&gt;
+                      &lt;a href=&quot;{{ .ConfirmationURL }}&quot; style=&quot;display:inline-block; padding:16px 36px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:10px; line-height:1.2; letter-spacing:0.32em; text-transform:uppercase; text-decoration:none; color:#D8D1C5; border:1px solid #9c2024;&quot;&gt;Confirm the change&amp;nbsp;&amp;rarr;&lt;/a&gt;
+                    &lt;/td&gt;
+                  &lt;/tr&gt;
+                &lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;The button does not work? Paste this into your browser:&lt;br /&gt;{{ .ConfirmationURL }}&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:32px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #2F2D29; border-top-color:rgba(216,209,197,0.14);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:22px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;If you did not ask for this, ignore it. Nothing has changed.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:34px 40px 40px;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #272522; border-top-color:rgba(216,209,197,0.10);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+                &lt;div style=&quot;padding-top:24px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#64605A;&quot;&gt;Est. 2026 &amp;mdash; Human / Celestial / Divine&lt;/div&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;19.0760&amp;deg; N &amp;mdash; 72.8777&amp;deg; E&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;/table&gt;
+          &lt;!--[if mso]&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;![endif]--&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/body&gt;
+&lt;/html&gt;" sandbox="allow-same-origin" scrolling="no"></iframe></div></div>
+</div>
+  </div>
+</section>
+<section style="padding:40px 0 48px;border-top:1px solid rgba(216,209,197,0.12);">
+  <div style="font:10px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.32em;text-transform:uppercase;color:#6E6A5F;">Authentication → Templates → Reset password</div>
+  <h2 style="margin:12px 0 0;font:400 30px/1.2 Georgia,'Times New Roman',serif;color:#D8D1C5;">Reset password</h2>
+  <div style="margin-top:14px;display:inline-block;padding:8px 14px;background:#131210;border:1px solid #2F2D29;border-radius:2px;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.1em;color:#D8D1C5;">Subject: Reset your password</div>
+  <p style="margin:16px 0 0;max-width:620px;font:14px/1.75 Georgia,'Times New Roman',serif;color:#98938A;">Nobody signs in with a password. Supabase's recover flow still needs a body that does not look borrowed.</p>
+  <div style="margin-top:8px;font:10px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#44423D;">File: supabase/email-templates/reset-password.html</div>
+  <div style="margin-top:28px;">
+<div class="frame">
+
+<div class="frame-slot"><div class="frame-box"><iframe title="Reset password" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; /&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot; /&gt;
+    &lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot; /&gt;
+    &lt;meta name=&quot;supported-color-schemes&quot; content=&quot;dark&quot; /&gt;
+    &lt;title&gt;Reset your password&lt;/title&gt;
+    &lt;!--[if mso]&gt;
+    &lt;xml&gt;
+      &lt;o:OfficeDocumentSettings&gt;
+        &lt;o:AllowPNG /&gt;
+        &lt;o:PixelsPerInch&gt;96&lt;/o:PixelsPerInch&gt;
+      &lt;/o:OfficeDocumentSettings&gt;
+    &lt;/xml&gt;
+    &lt;![endif]--&gt;
+  &lt;/head&gt;
+  &lt;body style=&quot;margin:0; padding:0; width:100%; background-color:#0D0C0A; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;&quot;&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;A link to set a new password. It expires shortly.&lt;/div&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&lt;/div&gt;
+
+    &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#0D0C0A&quot; style=&quot;width:100%; background-color:#0D0C0A;&quot;&gt;
+      &lt;tr&gt;
+        &lt;td align=&quot;center&quot; style=&quot;padding:48px 16px;&quot;&gt;
+          &lt;!--[if mso]&gt;&lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;![endif]--&gt;
+          &lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot; bgcolor=&quot;#131210&quot; style=&quot;width:600px; max-width:600px; background-color:#131210; border:1px solid #2F2D29; border-color:rgba(216,209,197,0.14);&quot;&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:44px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:12px; line-height:1; letter-spacing:0.32em; text-transform:uppercase; color:#D8D1C5;&quot;&gt;ON GOD.&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:22px 0 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; width=&quot;54&quot; style=&quot;width:54px;&quot;&gt;&lt;tr&gt;&lt;td height=&quot;2&quot; bgcolor=&quot;#7F1518&quot; style=&quot;height:2px; line-height:2px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:28px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:1.4; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;Credentials&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:16px 40px 0;&quot;&gt;
+                &lt;h1 style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:28px; line-height:1.2; font-weight:normal; letter-spacing:0.01em; color:#D8D1C5;&quot;&gt;Reset your password.&lt;/h1&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:15px; line-height:1.7; font-style:italic; color:#98938A;&quot;&gt;The link below sets a new one for {{ .Email }}. It works once.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:34px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot;&gt;
+                  &lt;tr&gt;
+                    &lt;td align=&quot;center&quot; bgcolor=&quot;#7F1518&quot; style=&quot;background-color:#7F1518;&quot;&gt;
+                      &lt;a href=&quot;{{ .ConfirmationURL }}&quot; style=&quot;display:inline-block; padding:16px 36px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:10px; line-height:1.2; letter-spacing:0.32em; text-transform:uppercase; text-decoration:none; color:#D8D1C5; border:1px solid #9c2024;&quot;&gt;Set a new password&amp;nbsp;&amp;rarr;&lt;/a&gt;
+                    &lt;/td&gt;
+                  &lt;/tr&gt;
+                &lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;The button does not work? Paste this into your browser:&lt;br /&gt;{{ .ConfirmationURL }}&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:32px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #2F2D29; border-top-color:rgba(216,209,197,0.14);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:22px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;If you did not ask for this, ignore it. Your password stays as it was.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:34px 40px 40px;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #272522; border-top-color:rgba(216,209,197,0.10);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+                &lt;div style=&quot;padding-top:24px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#64605A;&quot;&gt;Est. 2026 &amp;mdash; Human / Celestial / Divine&lt;/div&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;19.0760&amp;deg; N &amp;mdash; 72.8777&amp;deg; E&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;/table&gt;
+          &lt;!--[if mso]&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;![endif]--&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/body&gt;
+&lt;/html&gt;" sandbox="allow-same-origin" scrolling="no"></iframe></div></div>
+</div>
+  </div>
+</section>
+<section style="padding:40px 0 48px;border-top:1px solid rgba(216,209,197,0.12);">
+  <div style="font:10px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.32em;text-transform:uppercase;color:#6E6A5F;">Authentication → Templates → Reauthentication</div>
+  <h2 style="margin:12px 0 0;font:400 30px/1.2 Georgia,'Times New Roman',serif;color:#D8D1C5;">Reauthentication</h2>
+  <div style="margin-top:14px;display:inline-block;padding:8px 14px;background:#131210;border:1px solid #2F2D29;border-radius:2px;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:0.1em;color:#D8D1C5;">Subject: Confirm it is you</div>
+  <p style="margin:16px 0 0;max-width:620px;font:14px/1.75 Georgia,'Times New Roman',serif;color:#98938A;">The most sensitive of the six: a working link here is proof of identity, so the copy says so plainly.</p>
+  <div style="margin-top:8px;font:10px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#44423D;">File: supabase/email-templates/reauthentication.html</div>
+  <div style="margin-top:28px;">
+<div class="frame">
+
+<div class="frame-slot"><div class="frame-box"><iframe title="Reauthentication" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:v=&quot;urn:schemas-microsoft-com:vml&quot; xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;
+  &lt;head&gt;
+    &lt;meta charset=&quot;utf-8&quot; /&gt;
+    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot; /&gt;
+    &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot; /&gt;
+    &lt;meta name=&quot;color-scheme&quot; content=&quot;dark&quot; /&gt;
+    &lt;meta name=&quot;supported-color-schemes&quot; content=&quot;dark&quot; /&gt;
+    &lt;title&gt;Confirm it is you&lt;/title&gt;
+    &lt;!--[if mso]&gt;
+    &lt;xml&gt;
+      &lt;o:OfficeDocumentSettings&gt;
+        &lt;o:AllowPNG /&gt;
+        &lt;o:PixelsPerInch&gt;96&lt;/o:PixelsPerInch&gt;
+      &lt;/o:OfficeDocumentSettings&gt;
+    &lt;/xml&gt;
+    &lt;![endif]--&gt;
+  &lt;/head&gt;
+  &lt;body style=&quot;margin:0; padding:0; width:100%; background-color:#0D0C0A; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;&quot;&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;A sensitive action needs confirming. It expires shortly.&lt;/div&gt;
+    &lt;div style=&quot;display:none; font-size:1px; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden; mso-hide:all;&quot;&gt;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&amp;#847;&amp;zwnj;&amp;nbsp;&lt;/div&gt;
+
+    &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; bgcolor=&quot;#0D0C0A&quot; style=&quot;width:100%; background-color:#0D0C0A;&quot;&gt;
+      &lt;tr&gt;
+        &lt;td align=&quot;center&quot; style=&quot;padding:48px 16px;&quot;&gt;
+          &lt;!--[if mso]&gt;&lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;&lt;![endif]--&gt;
+          &lt;table role=&quot;presentation&quot; width=&quot;600&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot; bgcolor=&quot;#131210&quot; style=&quot;width:600px; max-width:600px; background-color:#131210; border:1px solid #2F2D29; border-color:rgba(216,209,197,0.14);&quot;&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:44px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:12px; line-height:1; letter-spacing:0.32em; text-transform:uppercase; color:#D8D1C5;&quot;&gt;ON GOD.&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:22px 0 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; width=&quot;54&quot; style=&quot;width:54px;&quot;&gt;&lt;tr&gt;&lt;td height=&quot;2&quot; bgcolor=&quot;#7F1518&quot; style=&quot;height:2px; line-height:2px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:28px 40px 0;&quot;&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:1.4; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;Sensitive action&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:16px 40px 0;&quot;&gt;
+                &lt;h1 style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:28px; line-height:1.2; font-weight:normal; letter-spacing:0.01em; color:#D8D1C5;&quot;&gt;Confirm it is you.&lt;/h1&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:Georgia,'Times New Roman',serif; font-size:15px; line-height:1.7; font-style:italic; color:#98938A;&quot;&gt;Something was requested for {{ .Email }} that asks for proof. This link expires shortly and works once.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:34px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; align=&quot;center&quot;&gt;
+                  &lt;tr&gt;
+                    &lt;td align=&quot;center&quot; bgcolor=&quot;#7F1518&quot; style=&quot;background-color:#7F1518;&quot;&gt;
+                      &lt;a href=&quot;{{ .ConfirmationURL }}&quot; style=&quot;display:inline-block; padding:16px 36px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:10px; line-height:1.2; letter-spacing:0.32em; text-transform:uppercase; text-decoration:none; color:#D8D1C5; border:1px solid #9c2024;&quot;&gt;It is me&amp;nbsp;&amp;rarr;&lt;/a&gt;
+                    &lt;/td&gt;
+                  &lt;/tr&gt;
+                &lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td align=&quot;center&quot; style=&quot;padding:18px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;The button does not work? Paste this into your browser:&lt;br /&gt;{{ .ConfirmationURL }}&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:32px 40px 0;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #2F2D29; border-top-color:rgba(216,209,197,0.14);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:22px 40px 0;&quot;&gt;
+                &lt;p style=&quot;margin:0; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; text-transform:uppercase; color:#6E6A5F;&quot;&gt;If this was not you, do not open the link.&lt;/p&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td style=&quot;padding:34px 40px 40px;&quot;&gt;
+                &lt;table role=&quot;presentation&quot; width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; border=&quot;0&quot; style=&quot;width:100%; border-top:1px solid #272522; border-top-color:rgba(216,209,197,0.10);&quot;&gt;&lt;tr&gt;&lt;td height=&quot;1&quot; style=&quot;height:1px; line-height:1px; font-size:0;&quot;&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+                &lt;div style=&quot;padding-top:24px; font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#64605A;&quot;&gt;Est. 2026 &amp;mdash; Human / Celestial / Divine&lt;/div&gt;
+                &lt;div style=&quot;font-family:'SFMono-Regular',Menlo,Consolas,'Courier New',monospace; font-size:9px; line-height:2; letter-spacing:0.32em; color:#44423D;&quot;&gt;19.0760&amp;deg; N &amp;mdash; 72.8777&amp;deg; E&lt;/div&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;/table&gt;
+          &lt;!--[if mso]&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;![endif]--&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/body&gt;
+&lt;/html&gt;" sandbox="allow-same-origin" scrolling="no"></iframe></div></div>
+</div>
+  </div>
+</section>
+</div>
+<script>
+/**
+ * Size each frame to its own content, then scale it to whatever the panel is.
+ * The card is a fixed 600px table; in a narrow panel it would clip rather than
+ * shrink, which is exactly the bug this avoids — the reader always sees the
+ * whole template, at a legible-enough ratio to judge the design.
+ */
+(function () {
+  var WIDTH = 632;
+  var frames = [].slice.call(document.querySelectorAll(".frame-box"));
+  var page = document.querySelector(".wrap");
+
+  function fit(box) {
+    var f = box.firstChild;
+    var h = 200;
+    // Collapse first, measure second. A framed document stretches to its box,
+    // so measuring first just reads the height this function already set —
+    // every frame would come back identical and clip its own footer.
+    box.style.height = "1px";
+    try {
+      var d = f.contentDocument;
+      h = Math.max(d.body.scrollHeight, d.documentElement.scrollHeight, 1);
+    } catch (e) { /* sandboxed: leave the default */ }
+    // Scaled against .wrap, never against the frame's own slot — writing a
+    // width back into the thing just measured collapses it to zero, permanently.
+    var scale = Math.min(1, page.clientWidth / WIDTH);
+    box.style.height = h + "px";
+    box.style.transform = scale === 1 ? "none" : "scale(" + scale + ")";
+    box.parentNode.style.height = h * scale + "px";
+  }
+
+  frames.forEach(function (box) {
+    var f = box.firstChild;
+    if (f.contentDocument && f.contentDocument.readyState !== "loading") fit(box);
+    f.addEventListener("load", function () { fit(box); });
+  });
+
+  var t;
+  addEventListener("resize", function () {
+    clearTimeout(t);
+    t = setTimeout(function () { frames.forEach(fit); }, 120);
+  });
+})();
+</script>
+</body>
+</html>
