@@ -151,47 +151,69 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       sizes?: Array<{ size: string; stock: number }>;
     };
 
-  // Variant replacement. Deleting and re-inserting keeps the form's model of
-  // "this is the complete size axis" without a diff algorithm; existing ids
-  // are preserved so a variant row referenced by order_items stays valid.
-  if (setVariants?.length) {
+  // Variant replacement.
+  //
+  // The form sends the whole size axis as `sizes`; `setVariants` is the older,
+  // richer shape. Both mean the same thing — this is the complete axis — so
+  // they take the same path.
+  //
+  // They used to diverge, and that divergence silently threw away stock: the
+  // `sizes` branch wrote only the size NAMES into products.sizes and never
+  // touched product_variants at all. An operator could set every number on the
+  // inventory panel, save, and see the old quantities again on reopen — with a
+  // success message and no error anywhere. Anything that persists the axis must
+  // persist the stock on it, or it is not really saving the axis.
+  const axis = setVariants?.length ? setVariants : sizes;
+  if (axis) {
     const { data: current } = await supabase
       .from("product_variants")
       .select("id, size")
       .eq("product_id", id);
 
-    const currentBySize = new Map((current ?? []).map((v) => [v.size, v.id]));
-    const keep = setVariants.filter((v) => currentBySize.has(v.size)).map((v) => currentBySize.get(v.size)!);
+    const currentBySize = new Map((current ?? []).map((v) => [v.size as string, v.id as string]));
+    // Sizes that were unticked. Deactivated rather than deleted: a variant
+    // referenced by a historical order is still an FK target, and the snapshot
+    // on the item is what an old order must keep reading.
     const drop = (current ?? [])
-      .filter((v) => !setVariants.some((s) => s.size === v.size))
-      .map((v) => v.id);
+      .filter((v) => !axis.some((s) => s.size === v.size))
+      .map((v) => v.id as string);
 
     if (drop.length) {
-      // Variants referenced by a historical order cannot be deleted — the
-      // snapshot is on the item, but the FK would still block it.
       await supabase.from("product_variants").update({ active: false }).in("id", drop);
     }
 
-    await supabase.from("product_variants").upsert(
-      setVariants.map((v) => ({
-        id: currentBySize.get(v.size),
-        product_id: id,
-        size: v.size,
-        stock: v.stock,
-        active: true,
-      })) as never,
-      { onConflict: "product_id,size" },
-    );
+    if (axis.length) {
+      // One write per row rather than a batched upsert.
+      //
+      // Both batched forms were tried and both are wrong here. Passing
+      // `id: undefined` for a new size serialises as null and trips the NOT
+      // NULL on id; omitting the key and upserting on (product_id,size) then
+      // fails the moment the batch also contains rows that DO carry an id,
+      // because merge-duplicates cannot resolve two conflict targets at once.
+      // Separate update-or-insert per size is boring and cannot be wrong. The
+      // axis is at most a handful of rows, so it costs nothing.
+      for (const v of axis) {
+        const existingId = currentBySize.get(v.size);
+        const write = existingId
+          ? supabase.from("product_variants").update({ stock: v.stock, active: true }).eq("id", existingId)
+          : supabase.from("product_variants").insert({
+              product_id: id,
+              size: v.size,
+              stock: v.stock,
+              active: true,
+            });
+        const { error: writeError } = await write;
+        if (writeError) {
+          return NextResponse.json({ error: writeError.message }, { status: 500 });
+        }
+      }
+    }
 
+    // An empty axis is meaningful too — it means every size is off sale, and
+    // products.sizes has to become "" rather than keeping yesterday's list.
     await supabase
       .from("products")
-      .update({ sizes: setVariants.map((v) => v.size).join(",") })
-      .eq("id", id);
-    void keep;
-  } else if (sizes?.length) {
-    await supabase
-      .from("products")
-      .update({ sizes: sizes.map((s) => s.size).join(",") })
+      .update({ sizes: axis.map((v) => v.size).join(",") })
       .eq("id", id);
   }
 
