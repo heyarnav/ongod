@@ -1,0 +1,11 @@
+node_modules
+.next
+.next-dev
+.env
+.env.local
+*.tsbuildinfo
+next-env.d.ts
+backups
+
+# Vercel CLI project linkage (written by `vercel link`, not source)
+.vercel

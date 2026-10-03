@@ -1,0 +1,209 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── on god. — global archive surface ─────────────────────────────── */
+
+:root {
+  --bg: #131210;
+  --ink: #D8D1C5;
+  --gray: #98938A;
+  --line: rgba(216, 209, 197, 0.14);
+  --crimson: #8E1B1F;
+}
+
+html {
+  background: var(--bg);
+  color-scheme: dark;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-jbm), ui-monospace, monospace;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #8E1B1F;
+  color: #f2ecdf;
+}
+
+/* dark native UI (scrollbars, form controls) in every browser */
+html {
+  color-scheme: dark;
+  scrollbar-width: thin;
+  scrollbar-color: #2e2c27 #131210;
+}
+
+/* thin archival scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #131210;
+}
+::-webkit-scrollbar-thumb {
+  background: #23211d;
+  border: 1px solid rgba(216, 209, 197, 0.12);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2e2c27;
+}
+
+/* scroll cue — a crimson drop travelling down the reference line */
+@keyframes scroll-cue-drop {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(300%);
+  }
+}
+.scroll-cue {
+  animation: scroll-cue-drop 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue {
+    animation: none;
+  }
+}
+
+/* ── typography helpers ───────────────────────────────────────────── */
+.font-serif-d {
+  font-family: var(--font-cormorant), Georgia, serif;
+}
+.font-black-d {
+  font-family: var(--font-unifraktur), var(--font-cormorant), serif;
+}
+
+/* ── archival surfaces ────────────────────────────────────────────── */
+.plate {
+  border: 1px solid var(--line);
+  background: rgba(18, 17, 16, 0.55);
+}
+
+.plate-inner {
+  box-shadow: inset 0 0 0 1px rgba(216, 210, 196, 0.04);
+}
+
+.hairline {
+  border-color: var(--line);
+}
+
+/* faint horizontal scan band, for plates only */
+.scanband {
+  position: relative;
+  overflow: hidden;
+}
+.scanband::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 3px,
+    rgba(0, 0, 0, 0.12) 3px 4px
+  );
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+}
+
+/* image treatment — archival grade, lifted for legibility */
+.archive-img {
+  filter: grayscale(0.25) contrast(1.02) brightness(1.06) sepia(0.06);
+}
+
+/* ── crimson system ───────────────────────────────────────────────── */
+.text-crimson {
+  color: #8E1B1F;
+}
+.border-crimson-soft {
+  border-color: rgba(127, 21, 24, 0.55);
+}
+.bg-crimson-soft {
+  background: rgba(127, 21, 24, 0.12);
+}
+
+/* ── link underline sweep (restrained) ───────────────────────────── */
+.link-sweep {
+  position: relative;
+}
+.link-sweep::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-sweep:hover::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link-sweep::after {
+    transition: none;
+  }
+}
+
+/* ── observation ticker — the crimson wire in motion ─────────────── */
+@keyframes wire {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.wire-track {
+  display: flex;
+  width: max-content;
+  animation: wire 36s linear infinite;
+}
+.wire-track:hover,
+.wire-track:focus-within {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wire-track {
+    animation: none;
+  }
+}
+
+/* ── focus: quiet but visible ─────────────────────────────────────── */
+:focus-visible {
+  outline: 1px solid rgba(127, 21, 24, 0.85);
+  outline-offset: 3px;
+}
+
+input,
+textarea,
+select {
+  color-scheme: dark;
+}
+
+/* ── paint budget: skip layout/paint for sections still off-screen ──
+   The page is long and image-heavy; the browser no longer has to lay
+   out and paint below-the-fold sections until they approach the
+   viewport. Intrinsic size keeps the scrollbar honest. */
+.cv-defer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
+}
