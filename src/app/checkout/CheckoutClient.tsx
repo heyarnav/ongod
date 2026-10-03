@@ -16,6 +16,10 @@ import { createClient } from "@/lib/supabase/browser";
 import { describeSendFailure, describeVerifyFailure } from "@/lib/auth-errors";
 import { openRazorpayCheckout } from "@/components/checkout/RazorpayModal";
 import { clearDraft, loadDraft, saveDraft, type CheckoutDraft } from "@/lib/checkout-draft";
+import type { CartLine } from "@/types";
+
+/** A line as the server returns it after re-pricing and re-checking stock. */
+type RestoredCartLine = CartLine & { available?: boolean; reason?: string };
 
 /**
  * Checkout — one form, three phases, no redirect.
@@ -106,6 +110,14 @@ export function CheckoutClient({
   const [orderNumber, setOrderNumber] = useState("");
   /** The uuid of an order that exists but has not been paid. Null until one does. */
   const [unpaidOrderId, setUnpaidOrderId] = useState<string | null>(null);
+  /** Opaque handle on the server-held basket, minted when the code is sent. */
+  const [draftToken, setDraftToken] = useState<string | null>(null);
+  /** The link was followed and we are asking the server what it kept. */
+  const [restoring, setRestoring] = useState(false);
+  /** The link was followed but the held basket is gone. Not "empty cart". */
+  const [draftExpired, setDraftExpired] = useState(false);
+  /** Pieces the server could not honour, named rather than silently dropped. */
+  const [dropped, setDropped] = useState<{ name: string; reason: string }[]>([]);
   const hydrated = useRef(false);
 
   /**
@@ -228,6 +240,102 @@ export function CheckoutClient({
     setFields((f) => ({ ...f, [key]: value }));
   }
 
+  /**
+   * Pick the checkout back up, from wherever the emailed link was opened.
+   *
+   * This runs once, on arrival at /checkout?draft=… — which is exactly where
+   * /auth/callback sends someone who followed the link in another browser,
+   * another device, an in-app mail viewer or a private window. In all of those
+   * places the basket is not in localStorage and the form is not in
+   * sessionStorage, so without this the shopper lands on a page claiming they
+   * have nothing to buy, seconds after proving they own the inbox.
+   *
+   * Three outcomes, and none of them is allowed to look like an empty cart:
+   *   - restored: the basket and the form come back
+   *   - partial: what came back, plus a note naming what could not be honoured
+   *   - expired: a recovery panel, because the server kept it for 30 minutes
+   *
+   * The token is dropped from the URL afterwards so a later refresh does not
+   * re-apply a half-hour-old basket over whatever the shopper has edited since.
+   */
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("draft");
+    if (!token) return;
+
+    let cancelled = false;
+    setRestoring(true);
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/checkout/draft?draft=${encodeURIComponent(token)}`, {
+          cache: "no-store",
+        });
+
+        if (res.status === 401) {
+          // Not signed in in THIS browser yet — the link may have been opened
+          // before the cookie landed, or the shopper is still anonymous here.
+          // Leave the token in the URL; continueToPayment() retries on the tick.
+          setRestoring(false);
+          return;
+        }
+        if (res.status === 410) {
+          if (!cancelled) {
+            setDraftExpired(true);
+            setRestoring(false);
+          }
+          return;
+        }
+        if (!res.ok) {
+          setRestoring(false);
+          return;
+        }
+
+        const data = (await res.json()) as {
+          lines?: RestoredCartLine[];
+          unavailable?: { name: string; reason?: string }[];
+          form?: Partial<Fields>;
+        };
+
+        if (cancelled) return;
+
+        const lines = Array.isArray(data.lines) ? data.lines : [];
+        if (lines.length) useCart.setState({ lines: lines as CartLine[] });
+        setDropped(
+          (data.unavailable ?? []).map((u) => ({
+            name: u.name || "A PIECE",
+            reason: u.reason || "No longer available.",
+          })),
+        );
+        if (data.form) {
+          setFields((f) => ({
+            ...f,
+            name: data.form?.name || f.name,
+            phone: data.form?.phone || f.phone,
+            address1: data.form?.address1 || f.address1,
+            address2: data.form?.address2 ?? f.address2,
+            city: data.form?.city || f.city,
+            state: data.form?.state || f.state,
+            pincode: data.form?.pincode || f.pincode,
+          }));
+        }
+        setDraftToken(token);
+        setDraftExpired(false);
+        setRestoring(false);
+        setVerified(true);
+
+        router.replace("/checkout", { scroll: false });
+      } catch {
+        if (!cancelled) setRestoring(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // Once, on arrival. Anything else would fight the shopper's own edits.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   /** Fill the form from a saved address. Manual edits clear the selection. */
   function applyAddress(a: SavedAddress) {
     setFields((f) => ({
@@ -267,9 +375,27 @@ export function CheckoutClient({
       const res = await fetch("/api/checkout/otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: fields.email.trim() }),
+        // The cart and the form go to the server HERE, before the mail goes
+        // out, so the link can restore them wherever it is opened. Nothing is
+        // ordered and no stock is held by this.
+        body: JSON.stringify({
+          email: fields.email.trim(),
+          cart: lines.map((l) => ({ productId: l.productId, size: l.size, quantity: l.quantity })),
+          form: {
+            name: fields.name,
+            phone: fields.phone,
+            address1: fields.address1,
+            address2: fields.address2,
+            city: fields.city,
+            state: fields.state,
+            pincode: fields.pincode,
+          },
+        }),
       });
       if (!res.ok) throw new Error("SEND_FAILED");
+
+      const sent = (await res.json()) as { draftToken?: string | null };
+      if (sent?.draftToken) setDraftToken(sent.draftToken);
 
       setPhase("verify");
       setCooldown(RESEND_SECONDS);
@@ -547,12 +673,43 @@ export function CheckoutClient({
     );
   }
 
-  if (!cartKnown) {
+  if (!cartKnown || restoring) {
     // Deliberately says nothing about the cart. Anything else here is a lie
-    // the server told before localStorage was read.
+    // the server told before localStorage was read, or before it has asked the
+    // server what it held for this shopper.
     return (
       <div className="mx-auto min-h-[60vh] max-w-[720px] px-5 pt-36 text-center">
         <ArchiveLabel tone="faint">READING THE REGISTER.</ArchiveLabel>
+      </div>
+    );
+  }
+
+  // The link was followed, but the basket the server kept for it is gone. This
+  // is NOT the same as having never had a cart, and it must never read that
+  // way: the shopper proved they were buying something.
+  if (draftExpired) {
+    return (
+      <div className="mx-auto min-h-[60vh] max-w-[720px] px-5 pt-36 text-center">
+        <ArchiveLabel tone="crimson">THE HELD BASKET HAS EXPIRED.</ArchiveLabel>
+        <p className="mx-auto mt-6 max-w-md font-mono text-[10px] leading-relaxed tracking-widest text-bone/73">
+          YOUR ADDRESS IS CONFIRMED. WE KEPT THE CART FOR 30 MINUTES WHILE YOU VERIFIED
+          IT, AND THAT HOLD HAS NOW LAPSED. NOTHING WAS CHARGED — REBUILD THE CART AND
+          CHECKOUT WILL NOT ASK FOR A CODE AGAIN.
+        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            href="/shop"
+            className="inline-block border border-bone/41 px-8 py-3 font-mono text-[10px] tracking-archive text-bone hover:border-crimson hover:text-crimson"
+          >
+            REBUILD THE CART
+          </Link>
+          <Link
+            href="/account/orders"
+            className="inline-block px-8 py-3 font-mono text-[10px] tracking-archive text-bone/41 hover:text-bone"
+          >
+            YOUR ORDERS
+          </Link>
+        </div>
       </div>
     );
   }
@@ -693,6 +850,22 @@ export function CheckoutClient({
           {isVerified && (
             <div className="mb-6 border border-bone/26 bg-bone/[0.03] px-4 py-3">
               <ArchiveLabel>EMAIL VERIFIED ✓ — CONTINUE TO PAYMENT BELOW</ArchiveLabel>
+            </div>
+          )}
+
+          {/* The basket was restored from the server and part of it could not
+              be honoured. Naming those pieces is the honest move — presenting a
+              quietly smaller order would look like we changed their mind. */}
+          {dropped.length > 0 && (
+            <div className="mb-6 border border-crimson/60 bg-crimson/5 px-4 py-3">
+              <ArchiveLabel tone="crimson">SOME PIECES CHANGED WHILE YOU WERE AWAY</ArchiveLabel>
+              <ul className="mt-2 space-y-1 font-mono text-[10px] leading-relaxed tracking-widest text-bone/73">
+                {dropped.map((d) => (
+                  <li key={d.name}>
+                    {d.name} — {d.reason}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 

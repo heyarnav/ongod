@@ -3,6 +3,7 @@ import crypto from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { siteOrigin } from "@/lib/site-origin";
+import { createCheckoutDraft, newDraftToken } from "@/lib/checkout-draft-server";
 
 /**
  * Send a checkout verification code.
@@ -30,7 +31,16 @@ import { siteOrigin } from "@/lib/site-origin";
 
 export const dynamic = "force-dynamic";
 
-const ALWAYS_OK = { ok: true } as const;
+/**
+ * The body is always `{ ok: true }`, plus the caller's own draft token.
+ *
+ * The token is returned whether or not anything was sent, and it says nothing
+ * about whether the address is a customer — it is a fresh random string that
+ * this response just invented. So the enumeration guarantee is intact.
+ */
+function okBody(draftToken: string | null) {
+  return { ok: true as const, draftToken };
+}
 
 /** Per-address. Generous enough for a genuine typo, tight enough to be useless. */
 const EMAIL_WINDOW_MINUTES = 10;
@@ -60,18 +70,33 @@ export async function POST(req: NextRequest) {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   let email = "";
+  let cart: unknown = [];
+  let form: unknown = {};
   try {
-    const body = (await req.json()) as { email?: unknown };
+    const body = (await req.json()) as { email?: unknown; cart?: unknown; form?: unknown };
     if (isEmail(body?.email)) email = body.email.trim().toLowerCase();
+    cart = body?.cart;
+    form = body?.form;
   } catch {
     // An unparseable body is treated exactly like an unthrottled stranger.
   }
+
+  // Minted before anything is sent so the response can always carry a token the
+  // client can restore from. It is not persisted yet — the row is created
+  // inside after(), so a throttled or failed send leaves nothing behind.
+  const draftToken = newDraftToken();
 
   if (email && supabaseUrl && anonKey) {
     // Read before after(): the emailed link is the only thing that carries this
     // shopper back to checkout, and a relative redirect_to is discarded by
     // Supabase without a word — the shopper would land on the homepage instead.
-    const redirectTo = `${siteOrigin(req)}/auth/callback?next=%2Fcheckout`;
+    //
+    // The draft token rides in `next`, and it is the ONLY draft detail in the
+    // URL: no address, name, product or price. Opened from any browser, any
+    // device, an in-app mail viewer or a private window, /checkout reads it back
+    // and restores the basket the server kept.
+    const next = `/checkout?draft=${draftToken}`;
+    const redirectTo = `${siteOrigin(req)}/auth/callback?next=${encodeURIComponent(next)}`;
 
     // Logged, because this string is invisible everywhere else. If the link in
     // a shopper's inbox takes them somewhere unexpected, this line in the
@@ -110,6 +135,11 @@ export async function POST(req: NextRequest) {
         // Housekeeping, best-effort, and never in the request path.
         admin.rpc("prune_checkout_otp_requests").then(() => {}, () => {});
 
+        // Past the throttle, so this only runs for a request that will actually
+        // produce an email. No order and no reservation is created here — this
+        // records an intention, nothing more.
+        await createCheckoutDraft({ token: draftToken, email, cart, form });
+
         const anon = createClient(supabaseUrl, anonKey, {
           auth: { autoRefreshToken: false, persistSession: false },
         });
@@ -136,5 +166,5 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  return NextResponse.json(ALWAYS_OK, { status: 200 });
+  return NextResponse.json(okBody(draftToken), { status: 200 });
 }

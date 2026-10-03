@@ -22,7 +22,8 @@
     "verify:payments": "node scripts/verify-payments.mjs",
     "verify:razorpay": "node scripts/verify-razorpay.mjs",
     "test:checkout": "node scripts/test-checkout-flow.mjs",
-    "verify:continuity": "node scripts/verify-retry-continuity.mjs"
+    "verify:continuity": "node scripts/verify-retry-continuity.mjs",
+    "test:draft": "node scripts/test-checkout-draft.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.6",
