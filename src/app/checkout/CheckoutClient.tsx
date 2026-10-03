@@ -104,6 +104,8 @@ export function CheckoutClient({
   const [cooldown, setCooldown] = useState(0);
   const [busy, setBusy] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  /** The uuid of an order that exists but has not been paid. Null until one does. */
+  const [unpaidOrderId, setUnpaidOrderId] = useState<string | null>(null);
   const hydrated = useRef(false);
 
   /**
@@ -358,8 +360,14 @@ export function CheckoutClient({
       if (!res.ok) throw new Error(data?.error ?? "CHECKOUT_FAILED");
 
       setOrderNumber(data.orderNumber);
-      clearDraft();
-      clear();
+      setUnpaidOrderId(data.orderId ?? null);
+
+      // The cart is NOT emptied here, and that used to be the single most
+      // expensive line in this file. An order exists at this point but no
+      // money has moved, and clearing the basket meant that anyone who closed
+      // the payment sheet — or simply refreshed — came back to a page that
+      // said they had nothing to buy, on an order they had already created and
+      // could not find. The basket is theirs until the money is.
       setPhase("paying");
 
       // Gateway dormant: the order exists and holds its stock, and the customer
@@ -387,12 +395,13 @@ export function CheckoutClient({
       });
 
       if (!result) {
-        // Dismissed, not declined. The order is still awaiting payment and the
-        // stock is still held — say so and offer the retry rather than
-        // declaring failure.
+        // Dismissed, not declined. The order still exists, still holds its
+        // stock, and the basket is still full — so this is a pause, not a
+        // failure, and the retry below reopens the SAME order rather than
+        // making a second one.
         setPhase("error");
         setMessage(
-          `PAYMENT NOT COMPLETED. ORDER ${data.orderNumber} STILL HOLDS YOUR PIECE — RETRY PAYMENT OR CLOSE THIS PAGE AND PAY FROM YOUR ACCOUNT.`,
+          `PAYMENT NOT COMPLETED. ORDER ${data.orderNumber} STILL HOLDS YOUR PIECE — RETRY PAYMENT, OR CLOSE THIS PAGE AND PAY FROM YOUR ACCOUNT.`,
         );
         return;
       }
@@ -410,6 +419,12 @@ export function CheckoutClient({
         }),
       }).catch(() => undefined);
 
+      // Paid. Only now is it safe to let go of the basket and the form draft —
+      // until this point they are the only record that the order on the
+      // server corresponds to anything.
+      clearDraft();
+      clear();
+
       router.push(`/checkout/success?order=${encodeURIComponent(data.orderNumber)}`);
     } catch (err) {
       setPhase("error");
@@ -419,6 +434,85 @@ export function CheckoutClient({
           ? "THAT SIZE IS GONE. NOTHING WAS CHARGED — RETURN TO THE ARCHIVE."
           : "THE ARCHIVE REJECTED THE REQUEST. NOTHING WAS CHARGED.",
       );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /**
+   * Reopen payment for the order that already exists.
+   *
+   * Deliberately NOT placeOrder() again. Calling it would POST /api/checkout a
+   * second time, which creates a second order and takes a second hold on the
+   * same stock — one abandoned PENDING order per retry, all of them holding
+   * inventory until the sweep releases it.
+   *
+   * /api/checkout/gateway already exists for exactly this and is careful about
+   * it: it returns the order's own gateway_order_id rather than creating a
+   * second Razorpay order (two of them is how a shopper pays twice), and it
+   * refuses once the hold has lapsed, because paying for an expired hold would
+   * take stock another shopper has since been given.
+   */
+  async function retryPayment() {
+    if (busy || !unpaidOrderId) return;
+    setBusy(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/checkout/gateway", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: unpaidOrderId }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        // An expired hold is the one case where the cart genuinely has to go
+        // back in play: this order can no longer be paid, so the shopper needs
+        // a fresh one, and the basket is exactly the state that makes that a
+        // single click rather than a re-entered address.
+        setMessage(
+          data?.error === "RESERVATION_EXPIRED"
+            ? `THE HOLD ON ORDER ${orderNumber} HAS LAPSED AND THE PIECE IS RELEASED. NOTHING WAS CHARGED — YOUR CART IS STILL INTACT, SO PLACE THE ORDER AGAIN.`
+            : `PAYMENT COULD NOT BE REOPENED. NOTHING WAS CHARGED — YOUR CART IS STILL INTACT.`,
+        );
+        return;
+      }
+
+      const result = await openRazorpayCheckout({
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        orderId: data.gatewayOrderId,
+        orderNumber,
+        customerName: fields.name,
+        customerEmail: fields.email,
+        customerPhone: fields.phone,
+      });
+
+      if (!result) {
+        setMessage(
+          `PAYMENT NOT COMPLETED. ORDER ${orderNumber} STILL HOLDS YOUR PIECE — RETRY PAYMENT, OR CLOSE THIS PAGE AND PAY FROM YOUR ACCOUNT.`,
+        );
+        return;
+      }
+
+      await fetch("/api/checkout/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderNumber,
+          razorpayOrderId: result.razorpay_order_id,
+          razorpayPaymentId: result.razorpay_payment_id,
+          razorpaySignature: result.razorpay_signature,
+        }),
+      }).catch(() => undefined);
+
+      clearDraft();
+      clear();
+      router.push(`/checkout/success?order=${encodeURIComponent(orderNumber)}`);
+    } catch {
+      setMessage("PAYMENT COULD NOT BE REOPENED. NOTHING WAS CHARGED — YOUR CART IS STILL INTACT.");
     } finally {
       setBusy(false);
     }
@@ -822,6 +916,20 @@ export function CheckoutClient({
               <p className="mt-4 border border-crimson/60 bg-crimson/10 px-3 py-2 font-mono text-[10px] leading-relaxed tracking-widest text-crimson">
                 {message}
               </p>
+            )}
+
+            {/* The retry reopens the order already made. Restarting checkout
+                instead would create a second one and hold the stock twice. */}
+            {phase === "error" && unpaidOrderId && (
+              <button
+                type="button"
+                onClick={retryPayment}
+                disabled={busy}
+                data-cursor="RETRY"
+                className="mt-4 w-full border border-crimson bg-crimson py-4 font-mono text-[11px] tracking-archive text-bone transition-opacity hover:opacity-90 disabled:opacity-40"
+              >
+                {busy ? "REOPENING…" : `RETRY PAYMENT — ORDER ${orderNumber}`}
+              </button>
             )}
 
             {/* One button, two destinations: verify the address, then pay. */}
