@@ -2,6 +2,7 @@ import { after, NextRequest, NextResponse } from "next/server";
 import crypto from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { siteOrigin } from "@/lib/site-origin";
 
 /**
  * Send a checkout verification code.
@@ -67,6 +68,16 @@ export async function POST(req: NextRequest) {
   }
 
   if (email && supabaseUrl && anonKey) {
+    // Read before after(): the emailed link is the only thing that carries this
+    // shopper back to checkout, and a relative redirect_to is discarded by
+    // Supabase without a word — the shopper would land on the homepage instead.
+    const redirectTo = `${siteOrigin(req)}/auth/callback?next=%2Fcheckout`;
+
+    // Logged, because this string is invisible everywhere else. If the link in
+    // a shopper's inbox takes them somewhere unexpected, this line in the
+    // deployment log is the whole diagnosis.
+    console.log(`[checkout-otp] link returns to ${redirectTo}`);
+
     const emailHash = hash(email);
     const ipHash = hash(clientIp(req));
 
@@ -109,7 +120,7 @@ export async function POST(req: NextRequest) {
             // This path mints the shopper. No signup form exists anywhere in the
             // store, so this is where a customer record comes from.
             shouldCreateUser: true,
-            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/auth/callback?next=%2Fcheckout`,
+            emailRedirectTo: redirectTo,
           },
         });
 

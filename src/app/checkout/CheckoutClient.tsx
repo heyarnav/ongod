@@ -82,8 +82,11 @@ export function CheckoutClient({
   const { lines, clear } = useCart();
   const subtotal = cartSubtotal(lines);
 
-  const [phase, setPhase] = useState<Phase>(signedInInitially ? "details" : "details");
+  const [phase, setPhase] = useState<Phase>("details");
   const [message, setMessage] = useState("");
+  // Someone who arrives with a session has already proven this inbox, so the
+  // panel below would only be asking them to prove it a second time.
+  const [verified, setVerified] = useState(signedInInitially);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -119,6 +122,74 @@ export function CheckoutClient({
     const t = setTimeout(() => setCooldown((c) => c - 1), 1000);
     return () => clearTimeout(t);
   }, [cooldown]);
+
+  /**
+   * Ask the server whether a session exists. 401 means "not yet" and mutates
+   * nothing, so this is safe to call speculatively — which is exactly what the
+   * panel below does while it waits for the shopper's inbox.
+   */
+  const adoptSession = useCallback(async () => {
+    const res = await fetch("/api/checkout/otp/verify", { cache: "no-store" });
+    if (!res.ok) return false;
+
+    const data = await res.json();
+    if (data.addresses) setAddresses(data.addresses as SavedAddress[]);
+    setCanSave(true);
+    if (data.email) setFields((f) => ({ ...f, email: data.email }));
+    return true;
+  }, []);
+
+  /** Everything that happens *after* the proof, whichever shape it arrived in. */
+  const continueToPayment = useCallback(() => {
+    setCode("");
+    setNotice(null);
+    setError(null);
+    setVerified(true);
+    setPhase("details");
+    // Refreshes the server components so the wrapper's view matches, without
+    // touching anything typed on this page.
+    router.refresh();
+  }, [router]);
+
+  /**
+   * Phase 2 also completes from the email's LINK, not only from the code.
+   *
+   * Supabase sends the six-digit code only to an address that already has an
+   * account. A first-time shopper — that is, nearly every customer — gets the
+   * confirm-signup link instead, so a panel that demands six digits would
+   * strand every new customer at the last step. Both shapes end the same way:
+   * the session cookie is written. So we watch the cookie rather than the
+   * input, which means the flow completes whether the shopper types the code,
+   * clicks the link in this tab, or clicks it in a different one.
+   */
+  useEffect(() => {
+    if (phase !== "verify") return;
+
+    let settled = false;
+    const check = async () => {
+      if (settled) return;
+      try {
+        if (await adoptSession()) {
+          settled = true;
+          continueToPayment();
+        }
+      } catch {
+        // Still anonymous. The next tick tries again.
+      }
+    };
+
+    // Covers the shopper who already clicked the link in another tab before we
+    // ever started waiting.
+    check();
+
+    const timer = setInterval(check, 3000);
+    window.addEventListener("focus", check);
+    return () => {
+      settled = true;
+      clearInterval(timer);
+      window.removeEventListener("focus", check);
+    };
+  }, [phase, adoptSession, continueToPayment]);
 
   function set<K extends keyof Fields>(key: K, value: string | boolean | null) {
     setFields((f) => ({ ...f, [key]: value }));
@@ -169,7 +240,9 @@ export function CheckoutClient({
 
       setPhase("verify");
       setCooldown(RESEND_SECONDS);
-      setNotice(`We've sent a six-digit code to ${fields.email.trim()}.`);
+      setNotice(
+        `Check ${fields.email.trim()} — enter the code there, or open the link in that message.`,
+      );
     } catch {
       // The endpoint answers 200 even when it is throttling us, so a failure
       // here is a transport problem rather than a verdict on the address.
@@ -201,21 +274,9 @@ export function CheckoutClient({
         // Ask the server who it thinks we are. The browser claiming a session
         // is not evidence of one, and this call also materialises the customer
         // row that place_order() requires to exist.
-        const res = await fetch("/api/checkout/otp/verify", { cache: "no-store" });
-        if (!res.ok) throw new Error("SESSION_NOT_READY");
+        if (!(await adoptSession())) throw new Error("SESSION_NOT_READY");
 
-        const data = await res.json();
-        if (data.addresses) setAddresses(data.addresses as SavedAddress[]);
-        setCanSave(true);
-        if (data.email) setFields((f) => ({ ...f, email: data.email }));
-
-        setCode("");
-        setNotice(null);
-        setPhase("details");
-        setMessage("EMAIL VERIFIED. CONTINUE TO PAYMENT.");
-        // Refreshes the server components so the wrapper's view matches, without
-        // touching anything typed on this page.
-        router.refresh();
+        continueToPayment();
       } catch (err) {
         // The form is deliberately untouched here: a wrong code must cost the
         // shopper nothing except the code they retyped.
@@ -225,7 +286,7 @@ export function CheckoutClient({
         setBusy(false);
       }
     },
-    [busy, code, fields.email, router],
+    [adoptSession, busy, code, continueToPayment, fields.email],
   );
 
   // ── Step 3. Create the order, then take payment ────────────────────────────
@@ -376,7 +437,7 @@ export function CheckoutClient({
     "w-full border border-bone/26 bg-transparent px-3 py-2.5 font-mono text-xs text-bone placeholder:text-bone/41 focus:border-crimson/60 focus:outline-none";
 
   const showOtp = phase === "verify";
-  const isVerified = message === "EMAIL VERIFIED. CONTINUE TO PAYMENT.";
+  const isVerified = verified;
 
   return (
     <div className="mx-auto max-w-[1100px] px-5 pb-32 pt-28 md:px-10 md:pt-36">
@@ -416,7 +477,8 @@ export function CheckoutClient({
               <div className="p-4">
                 <p className="font-mono text-[11px] leading-relaxed text-bone/73">
                   We&apos;ve sent a six-digit code to{" "}
-                  <span className="text-bone">{fields.email.trim()}</span>.
+                  <span className="text-bone">{fields.email.trim()}</span>. If your inbox
+                  gives you a link instead, open it.
                 </p>
 
                 <input
@@ -514,8 +576,8 @@ export function CheckoutClient({
             className={inputCls}
           />
           <p className="font-mono text-[9px] leading-relaxed tracking-widest text-bone/41">
-            A SIX-DIGIT CODE WILL BE SENT HERE TO CONFIRM THE ORDER. NOTHING IS CHARGED UNTIL
-            YOU COMPLETE PAYMENT.
+            WE WILL EMAIL YOU TO CONFIRM THE ORDER BEFORE ANYTHING IS CREATED. NOTHING IS
+            CHARGED UNTIL YOU COMPLETE PAYMENT.
           </p>
 
           <div className="pt-4">
@@ -732,7 +794,7 @@ export function CheckoutClient({
 
             {!isVerified && (
               <p className="mt-3 text-center font-mono text-[9px] leading-relaxed tracking-widest text-bone/41">
-                STEP 1 OF 2 — WE EMAIL A CODE FIRST. YOUR ORDER IS NOT CREATED UNTIL YOU
+                STEP 1 OF 2 — CONFIRM YOUR EMAIL FIRST. YOUR ORDER IS NOT CREATED UNTIL YOU
                 VERIFY.
               </p>
             )}

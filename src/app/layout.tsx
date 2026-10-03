@@ -35,7 +35,12 @@ export const metadata: Metadata = {
   },
   description:
     "on god. is a clothing archive documenting the human experience. HUMAN / CELESTIAL / DIVINE — three realms, one continuum.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  // `||`, not `??`: NEXT_PUBLIC_* is inlined at build time, so an environment
+  // variable that exists but is empty arrives as "" rather than undefined, and
+  // `??` lets that through — `new URL("")` throws, and the failure takes the
+  // whole build down rather than degrading to a wrong absolute URL in a social
+  // card.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   openGraph: {
     title: "on god. — a study in existence",
     description: "The human experience, documented. HUMAN / CELESTIAL / DIVINE.",

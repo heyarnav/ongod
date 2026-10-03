@@ -12,10 +12,23 @@ own ink so the mail a customer opens looks like the site they clicked from.
 | `reset-password.html` | **Reset password** | `Reset your password` |
 | `reauthentication.html` | **Reauthentication** | `Confirm it is you` |
 
-Only **Magic link or OTP** is live. `/account/login` and `/admin/login` both
-call `signInWithOtp`, and with Email OTP length set to 6 that template sends the
-code panel. The other five exist so no path of Supabase's Auth mail ever falls
-back to the default grey template.
+Only **Magic link or OTP** and **Confirm sign up** are live, and which one
+arrives depends on whether the address already has an account.
+
+`/account/login`, `/admin/login` and the checkout step all call
+`signInWithOtp` with `shouldCreateUser: true`. GoTrue answers with the
+**Confirm sign up** body when the address is new and the **Magic link** body
+when it is not — so a first-time shopper is sent a *link*, not a six-digit
+code. This is not a misconfiguration. There is no public-API way to force a
+code for an address with no account yet; it would mean minting the account
+server-side first, and minting unverified users on a public endpoint is a
+worse problem than the one it solves.
+
+The checkout panel accepts both shapes for that reason: type the code, or open
+the link. They end identically — the session cookie is written — so the page
+watches for the cookie rather than the input, and the step completes either
+way. The remaining templates exist so no path of Supabase's Auth mail falls
+back to the default grey body.
 
 ## Paste them in
 

@@ -1,6 +1,7 @@
 import { after, NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { siteOrigin } from "@/lib/site-origin";
 
 /**
  * Request a Control Room sign-in code.
@@ -48,6 +49,11 @@ export async function POST(req: NextRequest) {
   }
 
   if (email && supabaseUrl && anonKey) {
+    // Read before after(). A relative redirect_to is discarded by Supabase and
+    // replaced with the dashboard's Site URL, which strands the operator on the
+    // homepage with no session.
+    const redirectTo = `${siteOrigin(req)}/auth/callback?next=%2Fadmin`;
+
     after(async () => {
       try {
         const admin = createAdminClient();
@@ -77,7 +83,7 @@ export async function POST(req: NextRequest) {
             // Never create an account from the login screen. Customers are
             // created here on purpose; operators are not.
             shouldCreateUser: false,
-            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/auth/callback?next=%2Fadmin`,
+            emailRedirectTo: redirectTo,
           },
         });
 
