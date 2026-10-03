@@ -26,6 +26,23 @@ export default function AccountLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
+  /**
+   * Where to send the shopper once they have proved who they are.
+   *
+   * Same rule as the auth callback: same-origin paths only. An absolute URL
+   * read out of a query string would make this an open redirect, and this value
+   * is about to be pasted into an email as well as used on this device.
+   *
+   * Read from window.location rather than useSearchParams so the page does not
+   * need a Suspense boundary to stay statically renderable.
+   */
+  function destination(): string {
+    const requested = new URLSearchParams(window.location.search).get("next");
+    return requested && requested.startsWith("/") && !requested.startsWith("//")
+      ? requested
+      : "/account";
+  }
+
   /** A notice is the project's fault; only errors get the crimson treatment. */
   function report(notice: { message: string; tone: "error" | "notice" }) {
     if (notice.tone === "notice") {
@@ -43,7 +60,7 @@ export default function AccountLoginPage() {
     createClient()
       .auth.getSession()
       .then(({ data }) => {
-        if (data.session) router.replace("/account");
+        if (data.session) router.replace(destination());
       })
       .catch(() => {});
   }, [router]);
@@ -63,7 +80,7 @@ export default function AccountLoginPage() {
           // on a guarded page: the tokens can arrive as a URL fragment, which
           // middleware cannot see, and /account would redirect before they were
           // read. `next` is validated there as same-origin only.
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=%2Faccount`,
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(destination())}`,
         },
       });
       if (err) throw err;
@@ -90,7 +107,7 @@ export default function AccountLoginPage() {
       });
       if (err) throw err;
 
-      router.replace("/account");
+      router.replace(destination());
       router.refresh();
     } catch (err) {
       report(describeVerifyFailure(err));
