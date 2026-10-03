@@ -53,6 +53,34 @@ const WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET;
 
 let pass = 0;
 let fail = 0;
+
+/**
+ * Razorpay's SDK rejects with a plain object (`.error.description`,
+ * `.error.code`), not an Error, so `err.message` is undefined and
+ * `String(err)` prints the useless `[object Object]`. Pull out anything
+ * printable before it is lost.
+ */
+const describe = (err) => {
+  if (!err) return "(no error thrown)";
+  if (typeof err === "string") return err;
+  const parts = [];
+  if (err.error) {
+    parts.push(`code=${err.error.code ?? "?"}`);
+    parts.push(`description=${err.error.description ?? "?"}`);
+    parts.push(`source=${err.error.source ?? "?"}`);
+    parts.push(`step=${err.error.step ?? "?"}`);
+    if (err.error.metadata) parts.push(`metadata=${JSON.stringify(err.error.metadata)}`);
+  }
+  if (err.response) {
+    parts.push(`http=${err.response.statusCode ?? "?"}`);
+    if (err.response.body) parts.push(`body=${JSON.stringify(err.response.body).slice(0, 400)}`);
+  }
+  if (err.message) parts.push(`message=${err.message}`);
+  if (err.description) parts.push(`description=${err.description}`);
+  if (err.code) parts.push(`code=${err.code}`);
+  return parts.length ? parts.join("  ") : JSON.stringify(err);
+};
+
 const check = (label, ok, detail = "") => {
   if (ok) { pass++; console.log(`  PASS  ${label}`); }
   else { fail++; console.log(`  FAIL  ${label} ${detail}`); }
@@ -96,7 +124,7 @@ let created = null;
     check("currency is INR", created?.currency === "INR", created?.currency);
     console.log(`        (order ${created?.id})`);
   } catch (err) {
-    check("orders.create succeeded against Razorpay", false, err?.message ?? String(err));
+    check("orders.create succeeded against Razorpay", false, describe(err));
     console.log("\n  A 400 here usually means KYC is not activated for live mode;");
     console.log("  test keys should work regardless.\n");
   }
