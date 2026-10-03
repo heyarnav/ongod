@@ -106,6 +106,37 @@ export function CheckoutClient({
   const [orderNumber, setOrderNumber] = useState("");
   const hydrated = useRef(false);
 
+  /**
+   * Whether the persisted cart has been read back yet.
+   *
+   * The cart lives in localStorage, which does not exist on the server — so
+   * every server render of this page believes the cart is empty, and the HTML
+   * that arrives says "NOTHING TO ACQUIRE." That is not a cosmetic flash: the
+   * shopper who followed their emailed confirmation link waits through a cold
+   * function plus a rehydration and is told they have nothing, on a page they
+   * just proved they are allowed to buy from. If the bundle is slow the wrong
+   * answer simply stays on screen.
+   *
+   * So nothing here may claim to know what is in the cart until the store says
+   * it has finished reading.
+   *
+   * Deliberately starting at false rather than reading `hasHydrated()` as
+   * initial state: on the server that call already answers true, because
+   * zustand falls back to a no-op storage that resolves immediately. Asked the
+   * question during render, it would hand back the one answer that is always
+   * wrong.
+   */
+  const [cartKnown, setCartKnown] = useState(false);
+  useEffect(() => {
+    const done = () => setCartKnown(true);
+    if (useCart.persist.hasHydrated()) {
+      done();
+      return;
+    }
+    const unsubscribe = useCart.persist.onFinishHydration(done);
+    return unsubscribe;
+  }, []);
+
   // ── Draft persistence ──────────────────────────────────────────────────────
   // Every keystroke. A refresh mid-OTP must not cost the address.
   useEffect(() => {
@@ -422,10 +453,34 @@ export function CheckoutClient({
     );
   }
 
+  if (!cartKnown) {
+    // Deliberately says nothing about the cart. Anything else here is a lie
+    // the server told before localStorage was read.
+    return (
+      <div className="mx-auto min-h-[60vh] max-w-[720px] px-5 pt-36 text-center">
+        <ArchiveLabel tone="faint">READING THE REGISTER.</ArchiveLabel>
+      </div>
+    );
+  }
+
   if (!lines.length) {
     return (
       <div className="mx-auto min-h-[60vh] max-w-[720px] px-5 pt-36 text-center">
         <ArchiveLabel tone="faint">NOTHING TO ACQUIRE.</ArchiveLabel>
+
+        {/* The most common way to arrive here is a shopper who followed the
+            emailed confirmation link and opened it somewhere the cart does not
+            follow — another device, another browser, a private window. The
+            address is proven; the basket simply is not with us. Saying so beats
+            a dead end, and it is also true that the next visit will not ask them
+            to verify again. */}
+        {signedInInitially && (
+          <p className="mx-auto mt-6 max-w-md font-mono text-[10px] leading-relaxed tracking-widest text-bone/73">
+            YOUR ADDRESS IS CONFIRMED — YOUR CART IS NOT WITH US. RE-ADD AN OBJECT AND
+            CHECKOUT WILL NOT ASK FOR A CODE AGAIN.
+          </p>
+        )}
+
         <Link href="/shop" className="mt-8 inline-block border border-bone/41 px-8 py-3 font-mono text-[10px] tracking-archive text-bone hover:border-crimson hover:text-crimson">
           EXAMINE OBJECTS
         </Link>
